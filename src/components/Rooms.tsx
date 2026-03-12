@@ -14,7 +14,7 @@ const staticRooms: Room[] = [
     description_ru: 'Уютный номер с этно-декором, всем необходимым для комфортного проживания.',
     description_en: 'Cozy room with ethno decor and everything needed for comfortable stay.',
     description_kg: 'Этно-декор менен ыңгайлуу бөлмө.',
-    price_kgs: 3500, capacity: 2, image_url: 'https://lh3.googleusercontent.com/d/1q3z2pxxllqb6mhLW4r_ImUyc3LTmRKZi',
+    price_kgs: 3500, capacity: 2, image_url: 'https://cf.bstatic.com/xdata/images/hotel/max1024x768/770130070.jpg?k=edcb990e2a117827c69d23dd5199716c60110554e74e313397fad9b88be5fe47&o=',
     amenities: [], badge: 'Популярный', badge_type: 'popular', is_active: true
   },
   {
