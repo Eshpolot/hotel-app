@@ -1,6 +1,16 @@
 import { useEffect } from 'react';
+import { Users, MonitorPlay, Music2, Wifi, Coffee, ParkingCircle } from 'lucide-react';
 import Footer from '../components/Footer';
 import { useNavigate } from 'react-router-dom';
+
+const features = [
+  { icon: Users,       title: 'Вместимость', desc: 'До 50 человек' },
+  { icon: MonitorPlay, title: 'Проектор',    desc: 'Full HD оборудование' },
+  { icon: Music2,      title: 'Звук',        desc: 'Профессиональная акустика' },
+  { icon: Wifi,        title: 'Wi-Fi',       desc: 'Высокоскоростной интернет' },
+  { icon: Coffee,      title: 'Кофе-брейк',  desc: 'Кейтеринг под заказ' },
+  { icon: ParkingCircle, title: 'Парковка',  desc: 'Бесплатная парковка' },
+];
 
 export default function ConferencePage() {
   const navigate = useNavigate();
@@ -42,19 +52,14 @@ export default function ConferencePage() {
             </p>
 
             <div className="conference-features">
-              {[
-                { icon: '👥', title: 'Вместимость', desc: 'До 50 человек' },
-                { icon: '📽️', title: 'Проектор', desc: 'Full HD оборудование' },
-                { icon: '🎵', title: 'Звук', desc: 'Профессиональная акустика' },
-                { icon: '🌐', title: 'Wi-Fi', desc: 'Высокоскоростной интернет' },
-                { icon: '☕', title: 'Кофе-брейк', desc: 'Кейтеринг под заказ' },
-                { icon: '🅿️', title: 'Парковка', desc: 'Бесплатная парковка' },
-              ].map((item, i) => (
+              {features.map(({ icon: Icon, title, desc }, i) => (
                 <div className="conf-feature-item" key={i}>
-                  <span className="conf-feature-icon">{item.icon}</span>
+                  <div className="conf-feature-icon">
+                    <Icon size={20} strokeWidth={1.5} />
+                  </div>
                   <div>
-                    <strong>{item.title}</strong>
-                    <p>{item.desc}</p>
+                    <strong>{title}</strong>
+                    <p>{desc}</p>
                   </div>
                 </div>
               ))}

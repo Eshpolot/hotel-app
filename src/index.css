@@ -1074,3 +1074,34 @@ input, select, textarea { font-family:inherit; }
     height: 50vh;
   }
 }
+.conf-feature-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  color: inherit; /* наследует цвет от родителя — текст будет виден */
+}
+
+.conf-feature-item strong {
+  display: block;
+  color: #1a1a1a;       /* или var(--color-text) если есть переменная */
+  font-size: 0.95rem;
+  margin-bottom: 2px;
+}
+
+.conf-feature-item p {
+  color: #555;
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+.conf-feature-icon {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f5f0e8;   /* тёплый кремовый — под золотую тему отеля */
+  border-radius: 10px;
+  color: #b8912a;        /* золотой акцент */
+}
