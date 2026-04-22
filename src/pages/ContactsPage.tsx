@@ -12,7 +12,6 @@ export default function ContactsPage() {
 
   return (
     <>
-      {/* Hero */}
       <div className="page-hero contacts-hero">
         <div className="page-hero-overlay"></div>
         <div className="page-hero-content">
@@ -25,11 +24,9 @@ export default function ContactsPage() {
         </div>
       </div>
 
-      {/* Контент */}
       <section className="contacts-section section-pad">
         <div className="contacts-grid">
 
-          {/* Контактная информация */}
           <div className="contacts-info">
             <div className="section-label">
               <span className="line"></span>
@@ -46,7 +43,7 @@ export default function ContactsPage() {
                 <div className="contact-text">
                   <strong>Адрес</strong>
                   <p>г. Ош, 5 улица, Кыргызстан</p>
-                  
+                  <a
                     href="https://maps.apple.com/place?map=explore&address=Osh%2C+5+%D1%83%D0%BB%D0%B8%D1%86%D0%B0%2C+Kyrgyzstan&coordinate=40.497668%2C72.818444&name=Alay-Art+Hotel"
                     target="_blank"
                     rel="noreferrer"
@@ -87,9 +84,8 @@ export default function ContactsPage() {
               </div>
             </div>
 
-            {/* Соцсети — как на главной */}
             <div className="contact-social-btns">
-              
+              <a
                 href="https://www.instagram.com/alayart.hotel.osh"
                 target="_blank"
                 rel="noreferrer"
@@ -102,7 +98,7 @@ export default function ContactsPage() {
                 </svg>
                 Instagram
               </a>
-              
+              <a
                 href="https://wa.me/996550323070"
                 target="_blank"
                 rel="noreferrer"
@@ -116,7 +112,6 @@ export default function ContactsPage() {
             </div>
           </div>
 
-          {/* Карта — тот же src что на главной */}
           <div className="contacts-map">
             <iframe
               src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3046.8!2d72.818444!3d40.497668!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNDDCsDI5JzUxLjYiTiA3MsKwNDknMDYuNCJF!5e0!3m2!1sru!2skg!4v1"
