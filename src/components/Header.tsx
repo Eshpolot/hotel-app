@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import UserMenu from './UserMenu';
@@ -11,49 +11,40 @@ export default function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [authOpen, setAuthOpen] = useState(false);
-  const [activeSection, setActiveSection] = useState('hero');
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const isHome = location.pathname === '/';
 
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 80);
-
-      // Active nav tracking
-      const sections = ['hero', 'features', 'rooms', 'why', 'experiences', 'testimonials', 'contact'];
-      let current = 'hero';
-      sections.forEach(id => {
-        const el = document.getElementById(id);
-        if (el && window.scrollY >= el.offsetTop - 200) current = id;
-      });
-      setActiveSection(current);
-    };
+    const handleScroll = () => setScrolled(window.scrollY > 80);
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   const scrollTo = (id: string) => {
     setMenuOpen(false);
-    if (window.location.pathname !== '/') {
+    if (!isHome) {
       navigate('/');
       setTimeout(() => {
         document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
-      }, 100);
+      }, 300);
     } else {
       document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
     }
   };
 
+  const isActive = (path: string) => location.pathname === path;
+
   return (
     <>
       <header className={`header ${scrolled ? 'scrolled' : 'transparent'}`} id="header">
         <div className="header-inner">
+
           {/* Logo */}
-          <div className="logo" onClick={() => scrollTo('hero')}>
+          <div className="logo" onClick={() => navigate('/')}>
             <div className="logo-icon">
-              <img
-                src="/logo.png?v=2"
-                alt="ALAY ART Logo"
-              />
+              <img src="/logo.png" alt="ALAY ART Logo" />
             </div>
             <div className="logo-text">
               <h1>ALAY ART</h1>
@@ -62,11 +53,35 @@ export default function Header() {
           </div>
 
           {/* Nav */}
-          <nav className={`nav-links ${menuOpen ? 'open' : ''}`} id="nav-links">
-            <a onClick={() => scrollTo('hero')} className={activeSection === 'hero' ? 'active' : ''}>{t('home')}</a>
-            <a onClick={() => scrollTo('rooms')} className={activeSection === 'rooms' ? 'active' : ''}>{t('rooms')}</a>
-            <a onClick={() => scrollTo('experiences')} className={activeSection === 'experiences' ? 'active' : ''}>{t('conference')}</a>
-            <a onClick={() => scrollTo('contact')} className={activeSection === 'contact' ? 'active' : ''}>{t('contacts')}</a>
+          <nav className={`nav-links ${menuOpen ? 'open' : ''}`}>
+            <Link
+              to="/"
+              className={isActive('/') ? 'active' : ''}
+              onClick={() => setMenuOpen(false)}
+            >
+              {t('home')}
+            </Link>
+            <Link
+              to="/rooms"
+              className={isActive('/rooms') ? 'active' : ''}
+              onClick={() => setMenuOpen(false)}
+            >
+              {t('rooms')}
+            </Link>
+            <Link
+              to="/conference"
+              className={isActive('/conference') ? 'active' : ''}
+              onClick={() => setMenuOpen(false)}
+            >
+              {t('conference')}
+            </Link>
+            <Link
+              to="/contacts"
+              className={isActive('/contacts') ? 'active' : ''}
+              onClick={() => setMenuOpen(false)}
+            >
+              {t('contacts')}
+            </Link>
           </nav>
 
           {/* Controls */}
@@ -98,7 +113,6 @@ export default function Header() {
               </button>
             )}
 
-            {/* Hamburger */}
             <button
               className={`hamburger ${menuOpen ? 'open' : ''}`}
               onClick={() => setMenuOpen(!menuOpen)}
@@ -112,9 +126,7 @@ export default function Header() {
         </div>
       </header>
 
-      {/* Scroll to top */}
       <ScrollTopButton />
-
       <AuthModal isOpen={authOpen} onClose={() => setAuthOpen(false)} />
     </>
   );

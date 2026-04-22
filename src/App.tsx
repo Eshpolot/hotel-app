@@ -6,6 +6,9 @@ import Header from './components/Header';
 import Home from './pages/Home';
 import Profile from './pages/Profile';
 import Admin from './pages/Admin';
+import RoomsPage from './pages/RoomsPage';
+import ConferencePage from './pages/ConferencePage';
+import ContactsPage from './pages/ContactsPage';
 
 function ProtectedRoute({ children }: { children: ReactNode }) {
   const { user, isLoading } = useAuth();
@@ -35,6 +38,9 @@ function AppRoutes() {
       <Header />
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/rooms" element={<RoomsPage />} />
+        <Route path="/conference" element={<ConferencePage />} />
+        <Route path="/contacts" element={<ContactsPage />} />
         <Route path="/profile" element={
           <ProtectedRoute><Profile /></ProtectedRoute>
         } />
