@@ -1214,3 +1214,69 @@ input, select, textarea { font-family:inherit; }
     gap: 32px;
   }
 }
+/* ===== CONTACT SECTION — текст и кнопки ===== */
+.contact-item h4 {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 4px;
+}
+
+.contact-item p,
+.contact-item p a {
+  font-size: 15px;
+  color: #444444;
+  text-decoration: none;
+  margin: 0;
+}
+
+.contact-item p a:hover {
+  color: var(--gold);
+}
+
+.contact-item > div > a {
+  font-size: 13px;
+  color: var(--gold);
+  text-decoration: underline;
+}
+
+.contact-social-btns {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+
+.contact-social-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 22px;
+  border-radius: 50px;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  line-height: 1;
+  transition: all 0.3s ease;
+}
+
+.contact-social-btn--gold {
+  background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+  color: var(--accent-deep);
+}
+
+.contact-social-btn--gold:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(201,163,71,0.4);
+}
+
+.contact-social-btn--green {
+  background: linear-gradient(135deg, #25d366, #128c7e);
+  color: #ffffff;
+}
+
+.contact-social-btn--green:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(37,211,102,0.35);
+}

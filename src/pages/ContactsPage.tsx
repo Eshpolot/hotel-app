@@ -82,11 +82,11 @@ export default function ContactsPage() {
 
             {/* Соцсети */}
             <div className="contact-socials">
-              <a href="#" className="social-btn">
+              <a href="https://www.instagram.com/alayart.hotel.osh" className="social-btn">
                 <Instagram size={16} strokeWidth={1.5} />
                 Instagram
               </a>
-              <a href="#" className="social-btn">
+              <a href="https://wa.me/996550323070" className="social-btn">
                 <MessageCircle size={16} strokeWidth={1.5} />
                 WhatsApp
               </a>
@@ -100,7 +100,7 @@ export default function ContactsPage() {
           {/* Карта */}
           <div className="contacts-map">
             <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2949.123!2d72.7936!3d40.5283!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x38bc9df9e3fc96bd%3A0x8b1f9e8b1e3e3b1e!2sOsh%2C%20Kyrgyzstan!5e0!3m2!1sru!2skg!4v1234567890"
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3046.8!2d72.818444!3d40.497668!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNDDCsDI5JzUxLjYiTiA3MsKwNDknMDYuNCJF!5e0!3m2!1sru!2skg!4v1"
               width="100%"
               height="100%"
               style={{ border: 0, borderRadius: '16px', minHeight: '420px' }}
