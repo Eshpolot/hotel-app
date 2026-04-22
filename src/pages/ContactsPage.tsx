@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { MapPin, Phone, Mail, Clock, Instagram, MessageCircle, Send } from 'lucide-react';
 import Footer from '../components/Footer';
 import { useNavigate } from 'react-router-dom';
 
@@ -39,28 +40,39 @@ export default function ContactsPage() {
 
             <div className="contact-items">
               <div className="contact-item">
-                <div className="contact-icon">📍</div>
+                <div className="contact-icon">
+                  <MapPin size={20} strokeWidth={1.5} />
+                </div>
                 <div>
                   <strong>Адрес</strong>
                   <p>г. Ош, ул. Примерная, 123<br />Кыргызстан</p>
                 </div>
               </div>
+
               <div className="contact-item">
-                <div className="contact-icon">📞</div>
+                <div className="contact-icon">
+                  <Phone size={20} strokeWidth={1.5} />
+                </div>
                 <div>
                   <strong>Телефон</strong>
                   <p><a href="tel:+996XXXXXXXXX">+996 XXX XXX XXX</a></p>
                 </div>
               </div>
+
               <div className="contact-item">
-                <div className="contact-icon">✉️</div>
+                <div className="contact-icon">
+                  <Mail size={20} strokeWidth={1.5} />
+                </div>
                 <div>
                   <strong>Email</strong>
                   <p><a href="mailto:info@alayart.kg">info@alayart.kg</a></p>
                 </div>
               </div>
+
               <div className="contact-item">
-                <div className="contact-icon">🕐</div>
+                <div className="contact-icon">
+                  <Clock size={20} strokeWidth={1.5} />
+                </div>
                 <div>
                   <strong>Ресепшн</strong>
                   <p>24/7 — всегда на связи</p>
@@ -70,9 +82,18 @@ export default function ContactsPage() {
 
             {/* Соцсети */}
             <div className="contact-socials">
-              <a href="#" className="social-btn">Instagram</a>
-              <a href="#" className="social-btn">WhatsApp</a>
-              <a href="#" className="social-btn">Telegram</a>
+              <a href="#" className="social-btn">
+                <Instagram size={16} strokeWidth={1.5} />
+                Instagram
+              </a>
+              <a href="#" className="social-btn">
+                <MessageCircle size={16} strokeWidth={1.5} />
+                WhatsApp
+              </a>
+              <a href="#" className="social-btn">
+                <Send size={16} strokeWidth={1.5} />
+                Telegram
+              </a>
             </div>
           </div>
 
