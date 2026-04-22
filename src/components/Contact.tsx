@@ -86,7 +86,7 @@ export default function Contact() {
 
           {/* Соцсети */}
           <div className="contact-social-btns">
-            
+            <a
               href="https://www.instagram.com/alayart.hotel.osh"
               target="_blank"
               rel="noreferrer"
@@ -99,7 +99,7 @@ export default function Contact() {
               </svg>
               Instagram
             </a>
-            
+            <a
               href="https://wa.me/996550323070"
               target="_blank"
               rel="noreferrer"
