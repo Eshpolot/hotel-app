@@ -1105,3 +1105,112 @@ input, select, textarea { font-family:inherit; }
   border-radius: 10px;
   color: #b8912a;        /* золотой акцент */
 }
+/* ===== CONTACTS ===== */
+.contacts-section {
+  background: #faf8f4;
+}
+
+.contacts-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  align-items: start;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.contact-items {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  margin: 32px 0;
+}
+
+.contact-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.contact-icon {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f0e8d5;
+  border-radius: 12px;
+  color: #b8912a;
+}
+
+/* ГЛАВНОЕ — текст контактов */
+.contact-text strong {
+  display: block;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1a1a1a;        /* чёрный — всегда виден */
+  margin-bottom: 4px;
+}
+
+.contact-text p {
+  font-size: 0.9rem;
+  color: #444444;        /* тёмно-серый — хорошо читается */
+  margin: 0;
+  line-height: 1.5;
+}
+
+.contact-text a {
+  color: #444444;
+  text-decoration: none;
+}
+
+.contact-text a:hover {
+  color: #b8912a;
+}
+
+/* Карта */
+.contacts-map {
+  height: 100%;
+  min-height: 420px;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+}
+
+.contacts-map iframe {
+  display: block;
+}
+
+/* Соцсети */
+.contact-socials {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.social-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: 50px;
+  background: #1a1a1a;
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+
+.social-btn:hover {
+  background: #b8912a;
+}
+
+@media (max-width: 768px) {
+  .contacts-grid {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+}
