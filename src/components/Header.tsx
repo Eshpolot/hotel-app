@@ -51,7 +51,7 @@ export default function Header() {
           <div className="logo" onClick={() => scrollTo('hero')}>
             <div className="logo-icon">
               <img
-                src="https://lh3.googleusercontent.com/d/10Zt_FsN9C5SM8C6Xg1EGJ_cBPa7xAAus"
+                src="/logo.png?v=2"
                 alt="ALAY ART Logo"
               />
             </div>
