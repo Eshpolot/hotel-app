@@ -16,4 +16,29 @@ export default defineConfig({
       "@": path.resolve(__dirname, "src"),
     },
   },
+
+  // ============================================
+  // SPA Configuration for React Router
+  // (Handles client-side routing in dev/preview)
+  // ============================================
+  server: {
+    // Vite dev server: automatically falls back to index.html
+    // for non-file routes (SPA routing)
+    middlewareMode: false,
+  },
+
+  preview: {
+    // Preview server: test production build locally
+    port: 4173,
+    strictPort: false,
+  },
+
+  build: {
+    target: "esnext",
+    minify: "terser",
+    outDir: "dist",
+    assetsDir: "assets",
+    sourcemap: false,
+  },
+  // ============================================
 });
