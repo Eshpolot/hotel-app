@@ -8,7 +8,7 @@ const KGS_TO_USD = 0.011;
 const translations: Record<Lang, Record<string, string>> = {
   ru: {
     home: 'Главная', rooms: 'Номера', national_cuisine: 'Национальная кухня',
-    conference: 'Конференц-зал', contacts: 'Контакты', login: 'Войти',
+    contacts: 'Контакты', login: 'Войти',
     welcome: 'Добро пожаловать в', slogan: 'Этно-стиль, комфорт и незабываемые впечатления в сердце Кыргызстана.',
     book: 'Забронировать', explore: 'Узнать больше', hero_badge: 'Этно-стиль & Комфорт',
     breakfast: 'Завтрак', breakfast_text: 'Свежие блюда каждое утро, приготовленные из местных продуктов.',
@@ -29,7 +29,6 @@ const translations: Record<Lang, Record<string, string>> = {
     exp_label: 'Услуги', exp_title: 'Наши услуги', exp_desc: 'Дополнительные удобства для идеального пребывания.',
     summer_kitchen: 'Летняя кухня', summer_kitchen_text: 'Блюда на мангале на свежем воздухе',
     rest_zone: 'Зона отдыха', rest_zone_text: 'Уютное место для расслабления и тишины',
-    conference_text: 'Современное оборудование для мероприятий',
     reviews_label: 'Отзывы', reviews_title: 'Что говорят наши гости',
     cta_title: 'Забронируйте незабываемый отдых',
     cta_desc: 'Позвоните нам или забронируйте онлайн. Лучшие цены — только на нашем сайте.',
@@ -70,7 +69,7 @@ const translations: Record<Lang, Record<string, string>> = {
   },
   en: {
     home: 'Home', rooms: 'Rooms', national_cuisine: 'National Cuisine',
-    conference: 'Conference Hall', contacts: 'Contacts', login: 'Login',
+    contacts: 'Contacts', login: 'Login',
     welcome: 'Welcome to', slogan: 'Ethno-style, comfort and unforgettable impressions in the heart of Kyrgyzstan.',
     book: 'Book Now', explore: 'Learn More', hero_badge: 'Ethno-style & Comfort',
     breakfast: 'Breakfast', breakfast_text: 'Fresh dishes every morning prepared from local ingredients.',
@@ -91,7 +90,6 @@ const translations: Record<Lang, Record<string, string>> = {
     exp_label: 'Services', exp_title: 'Our Services', exp_desc: 'Additional amenities for a perfect stay.',
     summer_kitchen: 'Summer Kitchen', summer_kitchen_text: 'Grilled dishes in the open air',
     rest_zone: 'Rest Zone', rest_zone_text: 'A cozy place for relaxation and tranquility',
-    conference_text: 'Modern equipment for events',
     reviews_label: 'Reviews', reviews_title: 'What Our Guests Say',
     cta_title: 'Book an Unforgettable Vacation',
     cta_desc: 'Call us or book online. Best prices — only on our website.',
@@ -132,7 +130,7 @@ const translations: Record<Lang, Record<string, string>> = {
   },
   kg: {
     home: 'Башкы бет', rooms: 'Бөлмөлөр', national_cuisine: 'Улуттук тамак-аш',
-    conference: 'Конференц-зал', contacts: 'Байланыштар', login: 'Кирүү',
+    contacts: 'Байланыштар', login: 'Кирүү',
     welcome: 'Кош келиңиз', slogan: 'Этно-стиль, ыңгайлуулук жана Кыргызстандын жүрөгүндө унутулгус таасирлер.',
     book: 'Брондоо', explore: 'Көбүрөөк билүү', hero_badge: 'Этно-стиль & Ыңгайлуулук',
     breakfast: 'Эртең мененки тамак', breakfast_text: 'Ар күнү жергиликтүү азыктардан жаңы тамактар.',
@@ -153,7 +151,6 @@ const translations: Record<Lang, Record<string, string>> = {
     exp_label: 'Кызматтар', exp_title: 'Биздин кызматтар', exp_desc: 'Идеалдуу болуу үчүн кошумча ыңгайлуулуктар.',
     summer_kitchen: 'Жайкы ашкана', summer_kitchen_text: 'Ачык абада мангалда тамактар',
     rest_zone: 'Эс алуу аймагы', rest_zone_text: 'Тынчтык жана эс алуу үчүн жай',
-    conference_text: 'Иш-чаралар үчүн заманбап жабдуулар',
     reviews_label: 'Пикирлер', reviews_title: 'Коноктор эмне дейт',
     cta_title: 'Унутулгус эс алуу брондоңуз',
     cta_desc: 'Бизге чалыңыз же онлайн брондоңуз.',

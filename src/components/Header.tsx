@@ -69,13 +69,6 @@ export default function Header() {
               {t('rooms')}
             </Link>
             <Link
-              to="/conference"
-              className={isActive('/conference') ? 'active' : ''}
-              onClick={() => setMenuOpen(false)}
-            >
-              {t('conference')}
-            </Link>
-            <Link
               to="/contacts"
               className={isActive('/contacts') ? 'active' : ''}
               onClick={() => setMenuOpen(false)}

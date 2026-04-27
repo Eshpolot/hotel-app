@@ -6,7 +6,6 @@ const images = [
   { src: 'https://lh3.googleusercontent.com/d/13Xnkpvj4j6wzSM1dUTDt-Hif_FmUM5Mb', alt: 'National Cuisine' },
   { src: 'https://lh3.googleusercontent.com/d/1g55aq5FEets7sv9aotVzJWp43OnfeBEp', alt: 'Comfort' },
   { src: 'https://lh3.googleusercontent.com/d/1iYXmMtHFaf6gI87n932UnBZaCym_Nwy2', alt: 'Design' },
-  { src: 'https://images.unsplash.com/photo-1517502884422-41eaead166d4?w=600&q=80', alt: 'Conference' },
   { src: 'https://lh3.googleusercontent.com/d/1wjwhqcqPHmMk_aFs3lj91c3zD7_ghJtc', alt: 'Rest Zone' },
   { src: 'https://lh3.googleusercontent.com/d/1ACiTO230XAOd20Fmh3Zp9iUYc5AtQJpa', alt: 'Hotel' },
 ];

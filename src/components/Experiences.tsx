@@ -3,7 +3,6 @@ import { useLanguage } from '../contexts/LanguageContext';
 
 const experiences = [
   { img: 'https://lh3.googleusercontent.com/d/1kvIxu6MY2nkacUNzPOX2ZKdxt7jhimen', titleKey: 'summer_kitchen', textKey: 'summer_kitchen_text' },
-  { img: 'https://images.unsplash.com/photo-1517502884422-41eaead166d4?w=800&q=80', titleKey: 'conference', textKey: 'conference_text' },
   { img: 'https://lh3.googleusercontent.com/d/1wjwhqcqPHmMk_aFs3lj91c3zD7_ghJtc', titleKey: 'rest_zone', textKey: 'rest_zone_text' },
 ];
 

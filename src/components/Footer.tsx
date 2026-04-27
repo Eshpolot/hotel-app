@@ -35,7 +35,6 @@ export default function Footer({ onNavClick }: FooterProps) {
           <ul>
             <li><a onClick={() => onNavClick('hero')}>{t('home')}</a></li>
             <li><a onClick={() => onNavClick('rooms')}>{t('rooms')}</a></li>
-            <li><a onClick={() => onNavClick('experiences')}>{t('conference')}</a></li>
             <li><a onClick={() => onNavClick('contact')}>{t('contacts')}</a></li>
           </ul>
         </div>
@@ -44,7 +43,6 @@ export default function Footer({ onNavClick }: FooterProps) {
           <ul>
             <li><a onClick={() => onNavClick('experiences')}>{t('summer_kitchen')}</a></li>
             <li><a onClick={() => onNavClick('experiences')}>{t('rest_zone')}</a></li>
-            <li><a onClick={() => onNavClick('experiences')}>{t('conference')}</a></li>
             <li><a onClick={() => onNavClick('features')}>{t('national_cuisine')}</a></li>
           </ul>
         </div>
