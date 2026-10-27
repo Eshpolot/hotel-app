@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import GuestGuide from '../components/GuestGuide';
 import Hero from '../components/Hero';
 import SearchBar from '../components/SearchBar';
 import GalleryStrip from '../components/GalleryStrip';
@@ -38,9 +39,10 @@ export default function Home() {
       <SearchBar onSearch={handleSearch} />
       <GalleryStrip />
       <Features />
-      <Rooms searchCheckIn={searchDates.checkIn} searchCheckOut={searchDates.checkOut} />
+      <Rooms searchCheckIn={searchDates.checkIn} searchCheckOut={searchDates.checkOut} searchGuests={searchDates.guests} />
       <WhyUs />
       <Experiences />
+      <GuestGuide />
       <Testimonials />
       <CTA />
       <Contact />

@@ -13,7 +13,7 @@ export default function Footer({ onNavClick }: FooterProps) {
         <div className="footer-brand">
           <div className="logo" onClick={() => onNavClick('hero')} style={{ cursor: 'pointer' }}>
             <div className="logo-icon">
-              <img src="https://lh3.googleusercontent.com/d/10Zt_FsN9C5SM8C6Xg1EGJ_cBPa7xAAus" alt="ALAY ART Logo" />
+              <img src="/logo.png" alt="ALAY ART Logo" />
             </div>
             <div className="logo-text">
               <h1>ALAY ART</h1>

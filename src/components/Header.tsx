@@ -14,7 +14,7 @@ export default function Header() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const isHome = location.pathname === '/';
+
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 80);
@@ -22,23 +22,11 @@ export default function Header() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const scrollTo = (id: string) => {
-    setMenuOpen(false);
-    if (!isHome) {
-      navigate('/');
-      setTimeout(() => {
-        document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
-      }, 300);
-    } else {
-      document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
   const isActive = (path: string) => location.pathname === path;
 
   return (
     <>
-      <header className={`header ${scrolled ? 'scrolled' : 'transparent'}`} id="header">
+      <header className={`header ${scrolled || location.pathname !== '/' ? 'scrolled' : 'transparent'}`} id="header">
         <div className="header-inner">
 
           {/* Logo */}

@@ -1,9 +1,11 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import SearchBar from '../components/SearchBar';
 import Rooms from '../components/Rooms';
 import Footer from '../components/Footer';
 import { useNavigate } from 'react-router-dom';
 
 export default function RoomsPage() {
+  const [search, setSearch] = useState({checkIn: '', checkOut: '', guests: '1'});
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -26,7 +28,8 @@ export default function RoomsPage() {
       </div>
 
       {/* Номера */}
-      <Rooms />
+      <SearchBar onSearch={(checkIn, checkOut, guests) => setSearch({checkIn, checkOut, guests})} />
+      <Rooms searchCheckIn={search.checkIn} searchCheckOut={search.checkOut} searchGuests={search.guests} />
 
       <Footer onNavClick={(id) => {
         navigate('/');

@@ -1,53 +1,57 @@
+import { roomSnapshot } from '../data/roomSnapshot';
+import hotelImages from '../data/hotelImages.json';
 import { useEffect, useRef, useState } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
-import { Room } from '../lib/supabase';
+import { supabase, Room } from '../lib/supabase';
+import { stayNights } from '../lib/booking';
 import BookingModal from './BookingModal';
 
 interface RoomsProps {
   searchCheckIn?: string;
   searchCheckOut?: string;
+  searchGuests?: string;
 }
 
-const staticRooms: Room[] = [
-  {
-    id: 1, type: 'standard', name_ru: 'Стандарт', name_en: 'Standard', name_kg: 'Стандарт',
-    description_ru: 'Уютный номер с этно-декором, всем необходимым для комфортного проживания.',
-    description_en: 'Cozy room with ethno decor and everything needed for comfortable stay.',
-    description_kg: 'Этно-декор менен ыңгайлуу бөлмө.',
-    price_kgs: 3500, capacity: 2, image_url: 'https://cf.bstatic.com/xdata/images/hotel/max1024x768/770130070.jpg?k=edcb990e2a117827c69d23dd5199716c60110554e74e313397fad9b88be5fe47&o=',
-    amenities: [], badge: 'Популярный', badge_type: 'popular', is_active: true
-  },
-  {
-    id: 2, type: 'deluxe', name_ru: 'Делюкс', name_en: 'Deluxe', name_kg: 'Делюкс',
-    description_ru: 'Просторный номер премиум-класса с панорамным видом и роскошной отделкой.',
-    description_en: 'Spacious premium room with panoramic views and luxurious finishes.',
-    description_kg: 'Панорамалык көрүнүшү бар кең бөлмө.',
-    price_kgs: 6500, capacity: 2, image_url: 'https://lh3.googleusercontent.com/d/1rEbP9-tlr4FOmXmkJBz71ADc2m8kAr3w',
-    amenities: [], badge: 'VIP', badge_type: 'vip', is_active: true
-  },
-  {
-    id: 3, type: 'family', name_ru: 'Семейный', name_en: 'Family', name_kg: 'Үй-бүлөлүк',
-    description_ru: 'Идеальный номер для семейного отдыха с двумя зонами и детскими удобствами.',
-    description_en: 'Perfect room for family vacation with two zones and children amenities.',
-    description_kg: 'Үй-бүлөлүк эс алуу үчүн идеалдуу бөлмө.',
-    price_kgs: 5000, capacity: 4, image_url: 'https://lh3.googleusercontent.com/d/1g55aq5FEets7sv9aotVzJWp43OnfeBEp',
-    amenities: [], badge: null, badge_type: null, is_active: true
-  },
-  {
-    id: 4, type: 'suite', name_ru: 'Люкс', name_en: 'Suite', name_kg: 'Люкс',
-    description_ru: 'Роскошный люкс с гостиной, спальней и потрясающим этническим интерьером.',
-    description_en: 'Luxurious suite with living room, bedroom and stunning ethnic interior.',
-    description_kg: 'Мейманкана жана уктоо бөлмөсү бар люкс.',
-    price_kgs: 9500, capacity: 2, image_url: 'https://lh3.googleusercontent.com/d/1iYXmMtHFaf6gI87n932UnBZaCym_Nwy2',
-    amenities: [], badge: 'VIP SUITE', badge_type: 'vip', is_active: true
-  },
-];
-
-export default function Rooms({ searchCheckIn = '', searchCheckOut = '' }: RoomsProps) {
+export default function Rooms({ searchCheckIn = '', searchCheckOut = '', searchGuests = '1' }: RoomsProps) {
   const { t, lang, formatPrice } = useLanguage();
   const ref = useRef<HTMLDivElement>(null);
   const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
   const [bookingOpen, setBookingOpen] = useState(false);
+
+  const [rooms, setRooms] = useState<Room[]>(roomSnapshot);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+  const [sort, setSort] = useState('recommended');
+  const [filter, setFilter] = useState('all');
+  const copy = (ru: string, en: string, kg: string) => lang === 'en' ? en : lang === 'kg' ? kg : ru;
+  const requestVersion = useRef(0);
+  const loadRooms = async () => {
+    const version = ++requestVersion.current;
+    setLoading(true); setError(false);
+    const controller = new AbortController();
+    const timeout = window.setTimeout(() => controller.abort(), 8000);
+    try {
+      const { data, error } = await supabase.from('rooms').select('*').eq('is_active', true).order('id').abortSignal(controller.signal);
+      if (error) throw error;
+      if (version === requestVersion.current) setRooms(data || []);
+    } catch {
+      if (version === requestVersion.current) { setRooms(roomSnapshot); setError(true); }
+    } finally {
+      window.clearTimeout(timeout);
+      if (version === requestVersion.current) setLoading(false);
+    }
+  };
+  useEffect(() => {
+    void loadRooms();
+    return () => { requestVersion.current++; };
+  }, []);
+  const localPhoto = (room: Room) => (hotelImages as Record<string, string>)[room.image_url || ''] || room.image_url || '/room-placeholder.svg';
+  const contactLink = (room: Room) => 'https://wa.me/996550323070?text=' + encodeURIComponent(
+    `ALAY ART: ${room.name_ru}. ${searchCheckIn || '—'} → ${searchCheckOut || '—'}. ${searchGuests || 1} guests. Уточните, пожалуйста, наличие и стоимость.`
+  );
+  const visibleRooms = rooms.filter(r => r.capacity >= Number(searchGuests || 1) && (filter === 'all' || r.type === filter))
+    .sort((a, b) => sort === 'price' ? a.price_kgs - b.price_kgs : sort === 'capacity' ? b.capacity - a.capacity : a.id - b.id);
+  const nights = stayNights(searchCheckIn, searchCheckOut);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -56,12 +60,13 @@ export default function Rooms({ searchCheckIn = '', searchCheckOut = '' }: Rooms
     );
     ref.current?.querySelectorAll('.anim').forEach(el => observer.observe(el));
     return () => observer.disconnect();
-  }, []);
+  }, [rooms, filter, sort, searchGuests]);
 
   const getRoomName = (room: Room) => lang === 'en' ? room.name_en : lang === 'kg' ? room.name_kg : room.name_ru;
   const getRoomDesc = (room: Room) => lang === 'en' ? room.description_en : lang === 'kg' ? room.description_kg : room.description_ru;
 
   const handleBook = (room: Room) => {
+    if (loading || error) return;
     setSelectedRoom(room);
     setBookingOpen(true);
   };
@@ -74,18 +79,34 @@ export default function Rooms({ searchCheckIn = '', searchCheckOut = '' }: Rooms
           <h2 className="section-title">{t('rooms_title')}</h2>
           <p className="section-desc">{t('rooms_desc')}</p>
         </div>
+        <div className="room-tools">
+          <div className="room-tabs" aria-label={copy('Тип номера', 'Room type', 'Бөлмө түрү')}>
+            {['all','standard','deluxe','family','suite'].map((type, i) => <button key={type} aria-pressed={filter === type} className={filter === type ? 'active' : ''} onClick={() => setFilter(type)}>{[copy('Все номера','All rooms','Бардык бөлмөлөр'),copy('Стандарт','Standard','Стандарт'),copy('Делюкс','Deluxe','Делюкс'),copy('Семейный','Family','Үй-бүлөлүк'),copy('Люкс','Suite','Люкс')][i]}</button>)}
+          </div>
+          <select aria-label={copy('Сортировка','Sort rooms','Иреттөө')} value={sort} onChange={e => setSort(e.target.value)}>
+            <option value="recommended">{copy('Рекомендуемые','Recommended','Сунушталган')}</option>
+            <option value="price">{copy('Сначала дешевле','Price: low to high','Арзаны биринчи')}</option>
+            <option value="capacity">{copy('Больше гостей','More guests','Көбүрөөк конок')}</option>
+          </select>
+        </div>
+        <p className="catalog-note">{copy('Выберите свой отдых. Заявку и наличие номера подтверждает отель.', 'Find your stay. Requests and availability are confirmed by the hotel.', 'Эс алууңузду тандаңыз. Өтүнмөнү жана бош бөлмөнү мейманкана ырастайт.')}</p>
+        {loading && <p className="catalog-state" role="status">{copy('Обновляем цены. Пока показан сохранённый каталог.','Refreshing prices. Showing saved catalogue.','Баалар жаңыланууда. Сакталган каталог көрсөтүлдү.')}</p>}
+        {error && <div className="catalog-state" role="alert"><p>{copy('Нет связи с системой бронирования. Показан сохранённый каталог: цены и наличие уточните у отеля.','Booking service is unavailable. Showing saved catalogue: confirm prices and availability with the hotel.','Брондоо системасы менен байланыш жок. Сакталган каталог көрсөтүлдү: бааларды мейманканадан тактаңыз.')}</p><button className="btn-gold" onClick={loadRooms}>{copy('Повторить','Retry','Кайталоо')}</button> <a href="tel:+996550323070">+996 550 323 070</a></div>}
+        {!loading && !error && !visibleRooms.length && <p className="catalog-state">{copy('Нет подходящих номеров. Измените фильтры или число гостей.','No matching rooms. Change filters or guest count.','Ылайыктуу бөлмө жок. Чыпкаларды өзгөртүңүз.')}</p>}
         <div className="rooms-grid">
-          {staticRooms.map((room, i) => (
-            <div className={`room-card anim ${i % 2 === 0 ? 'fade-left' : 'fade-right'}`} key={room.id} style={{ transitionDelay: `${i * 0.1}s` }}>
+          {visibleRooms.map((room, i) => (
+            <div className="room-card" key={room.id} style={{ transitionDelay: `${i * 0.1}s` }}>
               {room.badge && (
                 <span className={`room-badge ${room.badge_type === 'vip' ? 'vip' : 'popular'}`}>{room.badge}</span>
               )}
               <div className="room-img">
-                <img src={room.image_url || ''} alt={getRoomName(room)} loading="lazy" />
+                <img src={localPhoto(room)} onError={e => { e.currentTarget.onerror = null; e.currentTarget.src = '/room-placeholder.svg'; }} alt={getRoomName(room)} loading="lazy" />
                 <div className="room-img-overlay"></div>
+                {localPhoto(room) === '/images/ornament.webp' && <span className="photo-caption">{copy('Орнамент · фото номера уточняется','Ornament · room photo pending','Оймо · бөлмөнүн сүрөтү такталууда')}</span>}
               </div>
               <div className="room-body">
                 <h3>{getRoomName(room)}</h3>
+                <span className="capacity-label">{copy('До','Up to','Чейин')} {room.capacity} · {t('booking_guests')}</span>
                 <p>{getRoomDesc(room)}</p>
                 <div className="room-amenities">
                   <span className="room-amenity">
@@ -107,11 +128,14 @@ export default function Rooms({ searchCheckIn = '', searchCheckOut = '' }: Rooms
                     </span>
                   )}
                 </div>
+                {nights > 0 && <p className="stay-total">{formatPrice(room.price_kgs * nights)} / {nights} {t('booking_nights')}</p>}
                 <div className="room-footer">
                   <div className="room-price">
-                    {formatPrice(room.price_kgs)} <small>/ {t('per_night')}</small>
+                    {(loading || error) && '≈ '}{formatPrice(room.price_kgs)} <small>/ {t('per_night')}</small>
                   </div>
-                  <button className="room-book" onClick={() => handleBook(room)}>{t('book')}</button>
+                  {loading || error
+                    ? <a className="room-book" href={contactLink(room)} target="_blank" rel="noopener noreferrer">{copy('Уточнить','Enquire','Тактоо')}</a>
+                    : <button className="room-book" onClick={() => handleBook(room)}>{t('book')}</button>}
                 </div>
               </div>
             </div>
@@ -123,6 +147,7 @@ export default function Rooms({ searchCheckIn = '', searchCheckOut = '' }: Rooms
         isOpen={bookingOpen}
         onClose={() => setBookingOpen(false)}
         room={selectedRoom}
+        initialGuests={Number(searchGuests || 1)}
         initialCheckIn={searchCheckIn}
         initialCheckOut={searchCheckOut}
       />

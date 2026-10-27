@@ -1,3 +1,4 @@
+import { useDialog } from '../hooks/useDialog';
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -11,11 +12,13 @@ interface AuthModalProps {
 export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
   const { signInWithEmail, signUp, signInWithGoogle } = useAuth();
   const { t } = useLanguage();
+  const dialogRef = useDialog(isOpen);
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
   const [error, setError] = useState('');
+  const [notice, setNotice] = useState('');
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -41,8 +44,10 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
         if (!fullName.trim()) { setError('Введите ваше имя'); setLoading(false); return; }
         const { error: err } = await signUp(email, password, fullName);
         if (err) { setError(err); }
-        else { onClose(); onSuccess?.(); }
+        else { setNotice('Проверьте почту: для завершения регистрации может потребоваться подтверждение email. Затем войдите в аккаунт.'); setIsLogin(true); }
       }
+    } catch {
+      setError('Не удалось подключиться. Попробуйте ещё раз.');
     } finally {
       setLoading(false);
     }
@@ -50,27 +55,28 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
 
   const handleGoogle = async () => {
     setLoading(true);
-    await signInWithGoogle();
+    try { await signInWithGoogle(); } catch { setError('Не удалось войти через Google. Попробуйте вход по email.'); } finally { setLoading(false); }
   };
 
   if (!isOpen) return null;
 
   return (
     <div className={`modal-overlay ${isOpen ? 'open' : ''}`} onClick={e => { if (e.target === e.currentTarget) onClose(); }}>
-      <div className="modal-box">
-        <button className="modal-close" onClick={onClose}>✕</button>
+      <div ref={dialogRef} className="modal-box" role="dialog" aria-modal="true" aria-label={t('login')}>
+        <button aria-label="Закрыть / Close" className="modal-close" onClick={onClose}>✕</button>
         <h2>{isLogin ? t('login') : t('register_title')}</h2>
+        <p role="status">{notice}</p>
         <form onSubmit={handleSubmit}>
           {!isLogin && (
             <>
               <label>{t('full_name_label')}</label>
-              <input type="text" value={fullName} onChange={e => setFullName(e.target.value)} placeholder="Айбек Матисаков" required />
+              <input aria-label={t('full_name_label')} maxLength={120} autoComplete="name" type="text" value={fullName} onChange={e => setFullName(e.target.value)} placeholder="Айбек Матисаков" required />
             </>
           )}
           <label>Email</label>
-          <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="you@example.com" required />
+          <input aria-label="Email" autoComplete="email" type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="you@example.com" required />
           <label>{t('password_label')}</label>
-          <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" required minLength={6} />
+          <input aria-label={t('password_label')} autoComplete={isLogin ? "current-password" : "new-password"} type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" required minLength={6} />
           {error && <div className="modal-error">{error}</div>}
           <button type="submit" className="modal-submit" disabled={loading}>
             {loading ? '...' : (isLogin ? t('login') : t('register'))}

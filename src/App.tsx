@@ -1,11 +1,11 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { ReactNode } from 'react';
+import { ReactNode, lazy, Suspense } from 'react';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { LanguageProvider } from './contexts/LanguageContext';
 import Header from './components/Header';
 import Home from './pages/Home';
-import Profile from './pages/Profile';
-import Admin from './pages/Admin';
+const Profile = lazy(() => import('./pages/Profile'));
+const Admin = lazy(() => import('./pages/Admin'));
 import RoomsPage from './pages/RoomsPage';
 import ContactsPage from './pages/ContactsPage';
 
@@ -27,7 +27,7 @@ function AdminRoute({ children }: { children: ReactNode }) {
     </div>
   );
   if (!user) return <Navigate to="/" replace />;
-  if (profile && profile.role !== 'admin') return <Navigate to="/" replace />;
+  if (profile?.role !== 'admin') return <Navigate to="/" replace />;
   return <>{children}</>;
 }
 
@@ -35,6 +35,7 @@ function AppRoutes() {
   return (
     <>
       <Header />
+      <Suspense fallback={<div className="loading-screen" role="status">Загрузка…</div>}>
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/rooms" element={<RoomsPage />} />
@@ -47,6 +48,7 @@ function AppRoutes() {
         } />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
+      </Suspense>
     </>
   );
 }

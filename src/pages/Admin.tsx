@@ -10,6 +10,7 @@ export default function Admin() {
   const { user, profile, isLoading } = useAuth();
   const { t, formatPrice, lang } = useLanguage();
   const navigate = useNavigate();
+  const [actionError, setActionError] = useState('');
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [filtered, setFiltered] = useState<Booking[]>([]);
   const [loadingData, setLoadingData] = useState(true);
@@ -19,7 +20,7 @@ export default function Admin() {
   useEffect(() => {
     if (!isLoading) {
       if (!user) { navigate('/'); return; }
-      if (profile && profile.role !== 'admin') { navigate('/'); return; }
+      if (profile?.role !== 'admin') { navigate('/'); return; }
     }
   }, [user, profile, isLoading, navigate]);
 
@@ -47,8 +48,11 @@ export default function Admin() {
         .from('bookings')
         .select('*, room:rooms(*)')
         .order('created_at', { ascending: false });
-      if (!error && data) setBookings(data as Booking[]);
+      if (error) throw error;
+      setBookings((data || []) as Booking[]);
+      setActionError('');
     } catch (err) {
+      setActionError('Не удалось выполнить операцию. Обновите данные и повторите попытку.');
       console.error(err);
     } finally {
       setLoadingData(false);
@@ -57,9 +61,12 @@ export default function Admin() {
 
   const updateStatus = async (bookingId: string, newStatus: Booking['status']) => {
     try {
-      await supabase.from('bookings').update({ status: newStatus }).eq('id', bookingId);
+      const { data, error } = await supabase.from('bookings').update({ status: newStatus }).eq('id', bookingId).select('id').single();
+      if (error || !data) throw error || new Error('Not updated');
+      setActionError('');
       setBookings(prev => prev.map(b => b.id === bookingId ? { ...b, status: newStatus } : b));
     } catch (err) {
+      setActionError('Не удалось выполнить операцию. Обновите данные и повторите попытку.');
       console.error(err);
     }
   };
@@ -105,6 +112,7 @@ export default function Admin() {
 
   return (
     <div className="admin-page">
+      {actionError && <p role="alert" className="modal-error">{actionError} <button onClick={fetchAllBookings}>Обновить</button></p>}
       <div className="admin-container">
         {/* Header */}
         <div className="admin-header">
@@ -206,6 +214,8 @@ export default function Admin() {
                     <td>
                       <div style={{ fontWeight: 600 }}>{booking.guest_name}</div>
                       <div style={{ fontSize: 12, color: 'var(--text-secondary)' }}>{booking.guest_email}</div>
+                      {booking.guest_phone && <div>{booking.guest_phone}</div>}
+                      {booking.notes && <details><summary>Пожелания гостя</summary><p style={{maxWidth: 280, whiteSpace: 'pre-wrap'}}>{booking.notes}</p></details>}
                     </td>
                     <td>{getRoomName(booking)}</td>
                     <td style={{ fontSize: 13 }}>

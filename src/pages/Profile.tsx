@@ -8,6 +8,7 @@ export default function Profile() {
   const { user, profile, isLoading, signOut } = useAuth();
   const { t, formatPrice, lang } = useLanguage();
   const navigate = useNavigate();
+  const [actionError, setActionError] = useState('');
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loadingBookings, setLoadingBookings] = useState(true);
 
@@ -29,8 +30,11 @@ export default function Profile() {
         .select('*, room:rooms(*)')
         .eq('user_id', user!.id)
         .order('created_at', { ascending: false });
-      if (!error && data) setBookings(data as Booking[]);
+      if (error) throw error;
+      setBookings((data || []) as Booking[]);
+      setActionError('');
     } catch (err) {
+      setActionError('Не удалось выполнить операцию. Обновите данные и повторите попытку.');
       console.error('Failed to fetch bookings:', err);
     } finally {
       setLoadingBookings(false);
@@ -40,15 +44,18 @@ export default function Profile() {
   const cancelBooking = async (bookingId: string) => {
     if (!confirm(t('cancel_confirm'))) return;
     try {
-      await supabase
+      const { data, error } = await supabase
         .from('bookings')
         .update({ status: 'cancelled' })
         .eq('id', bookingId)
-        .eq('status', 'pending');
+        .eq('status', 'pending').select('id').single();
+      if (error || !data) throw error || new Error('Not updated');
+      setActionError('');
       setBookings(prev =>
         prev.map(b => b.id === bookingId ? { ...b, status: 'cancelled' as const } : b)
       );
     } catch (err) {
+      setActionError('Не удалось выполнить операцию. Обновите данные и повторите попытку.');
       console.error('Failed to cancel booking:', err);
     }
   };
@@ -127,6 +134,7 @@ export default function Profile() {
 
         {/* Bookings */}
         <div className="bookings-section">
+          {actionError && <p role="alert" className="modal-error">{actionError} <button onClick={fetchBookings}>Обновить</button></p>}
           <h3>{t('my_bookings')}</h3>
 
           {loadingBookings ? (

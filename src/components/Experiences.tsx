@@ -2,8 +2,8 @@ import { useEffect, useRef } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 
 const experiences = [
-  { img: 'https://lh3.googleusercontent.com/d/1kvIxu6MY2nkacUNzPOX2ZKdxt7jhimen', titleKey: 'summer_kitchen', textKey: 'summer_kitchen_text' },
-  { img: 'https://lh3.googleusercontent.com/d/1wjwhqcqPHmMk_aFs3lj91c3zD7_ghJtc', titleKey: 'rest_zone', textKey: 'rest_zone_text' },
+  { img: '/images/interior.webp', titleKey: 'summer_kitchen', textKey: 'summer_kitchen_text' },
+  { img: '/images/lounge.webp', titleKey: 'rest_zone', textKey: 'rest_zone_text' },
 ];
 
 export default function Experiences() {

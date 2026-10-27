@@ -20,9 +20,9 @@ export default function Hero({ onBookClick, onExploreClick }: HeroProps) {
           <span className="dot"></span>
           <span>{t('hero_badge')}</span>
         </div>
-        <h2 className="hero-title">
+        <h1 className="hero-title">
           {t('welcome')} <span className="gold">ALAY ART</span>
-        </h2>
+        </h1>
         <p className="hero-subtitle">{t('slogan')}</p>
         <div className="hero-buttons">
           <button className="btn-gold" onClick={onBookClick}>{t('book')}</button>
