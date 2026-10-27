@@ -1,8 +1,9 @@
-import { roomSnapshot } from '../data/roomSnapshot';
-import hotelImages from '../data/hotelImages.json';
+import { Link } from 'react-router-dom';
+import { useRooms } from '../hooks/useRooms';
+import { roomPhoto as localPhoto } from '../lib/roomMedia';
 import { useEffect, useRef, useState } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
-import { supabase, Room } from '../lib/supabase';
+import { Room } from '../lib/supabase';
 import { stayNights } from '../lib/booking';
 import BookingModal from './BookingModal';
 
@@ -13,39 +14,18 @@ interface RoomsProps {
 }
 
 export default function Rooms({ searchCheckIn = '', searchCheckOut = '', searchGuests = '1' }: RoomsProps) {
-  const { t, lang, formatPrice } = useLanguage();
+  const { t, lang, currency, formatPrice } = useLanguage();
   const ref = useRef<HTMLDivElement>(null);
   const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
   const [bookingOpen, setBookingOpen] = useState(false);
 
-  const [rooms, setRooms] = useState<Room[]>(roomSnapshot);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
+  const { rooms, loading, error, loadRooms } = useRooms();
   const [sort, setSort] = useState('recommended');
   const [filter, setFilter] = useState('all');
   const copy = (ru: string, en: string, kg: string) => lang === 'en' ? en : lang === 'kg' ? kg : ru;
-  const requestVersion = useRef(0);
-  const loadRooms = async () => {
-    const version = ++requestVersion.current;
-    setLoading(true); setError(false);
-    const controller = new AbortController();
-    const timeout = window.setTimeout(() => controller.abort(), 8000);
-    try {
-      const { data, error } = await supabase.from('rooms').select('*').eq('is_active', true).order('id').abortSignal(controller.signal);
-      if (error) throw error;
-      if (version === requestVersion.current) setRooms(data || []);
-    } catch {
-      if (version === requestVersion.current) { setRooms(roomSnapshot); setError(true); }
-    } finally {
-      window.clearTimeout(timeout);
-      if (version === requestVersion.current) setLoading(false);
-    }
-  };
-  useEffect(() => {
-    void loadRooms();
-    return () => { requestVersion.current++; };
-  }, []);
-  const localPhoto = (room: Room) => (hotelImages as Record<string, string>)[room.image_url || ''] || room.image_url || '/room-placeholder.svg';
+  const detailsLink = (room: Room) => `/rooms/${room.id}?` + new URLSearchParams({
+    checkIn: searchCheckIn, checkOut: searchCheckOut, guests: searchGuests || '1'
+  });
   const contactLink = (room: Room) => 'https://wa.me/996550323070?text=' + encodeURIComponent(
     `ALAY ART: ${room.name_ru}. ${searchCheckIn || '—'} → ${searchCheckOut || '—'}. ${searchGuests || 1} guests. Уточните, пожалуйста, наличие и стоимость.`
   );
@@ -105,7 +85,7 @@ export default function Rooms({ searchCheckIn = '', searchCheckOut = '', searchG
                 {localPhoto(room) === '/images/ornament.webp' && <span className="photo-caption">{copy('Орнамент · фото номера уточняется','Ornament · room photo pending','Оймо · бөлмөнүн сүрөтү такталууда')}</span>}
               </div>
               <div className="room-body">
-                <h3>{getRoomName(room)}</h3>
+                <h3><Link to={detailsLink(room)}>{getRoomName(room)}</Link></h3>
                 <span className="capacity-label">{copy('До','Up to','Чейин')} {room.capacity} · {t('booking_guests')}</span>
                 <p>{getRoomDesc(room)}</p>
                 <div className="room-amenities">
@@ -129,9 +109,10 @@ export default function Rooms({ searchCheckIn = '', searchCheckOut = '', searchG
                   )}
                 </div>
                 {nights > 0 && <p className="stay-total">{formatPrice(room.price_kgs * nights)} / {nights} {t('booking_nights')}</p>}
+                <Link className="room-details-link" to={detailsLink(room)}>{copy('Подробнее о номере', 'Explore this room', 'Бөлмө жөнүндө')} <span aria-hidden="true">↗</span></Link>
                 <div className="room-footer">
                   <div className="room-price">
-                    {(loading || error) && '≈ '}{formatPrice(room.price_kgs)} <small>/ {t('per_night')}</small>
+                    {(loading || error) && currency === 'KGS' && '≈ '}{formatPrice(room.price_kgs)} <small>/ {t('per_night')}</small>
                   </div>
                   {loading || error
                     ? <a className="room-book" href={contactLink(room)} target="_blank" rel="noopener noreferrer">{copy('Уточнить','Enquire','Тактоо')}</a>

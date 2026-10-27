@@ -20,7 +20,6 @@ export default function BookingModal({ isOpen, onClose, room, initialCheckIn = '
   const { user, profile } = useAuth();
   const { t, lang, formatPrice } = useLanguage();
   const dialogRef = useDialog(isOpen && !!user);
-  const [showAuth, setShowAuth] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
@@ -40,6 +39,9 @@ export default function BookingModal({ isOpen, onClose, room, initialCheckIn = '
       setGuestEmail(user?.email || '');
       setGuestPhone(profile?.phone || '');
     }
+  }, [isOpen, profile, user]);
+
+  useEffect(() => {
     if (isOpen) {
       setCheckIn(initialCheckIn || today());
       setGuestsCount(Math.min(initialGuests, room?.capacity || 1));
@@ -48,7 +50,7 @@ export default function BookingModal({ isOpen, onClose, room, initialCheckIn = '
       setError('');
       setSuccess(false);
     }
-  }, [isOpen, profile, user, initialCheckIn, initialCheckOut, initialGuests, room]);
+  }, [isOpen, initialCheckIn, initialCheckOut, initialGuests, room?.id, room?.capacity]);
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
@@ -63,13 +65,9 @@ export default function BookingModal({ isOpen, onClose, room, initialCheckIn = '
       <AuthModal
         isOpen={true}
         onClose={onClose}
-        onSuccess={() => setShowAuth(false)}
+        closeOnSuccess={false}
       />
     );
-  }
-
-  if (showAuth) {
-    return <AuthModal isOpen={true} onClose={() => setShowAuth(false)} onSuccess={() => setShowAuth(false)} />;
   }
 
   if (!room) return null;

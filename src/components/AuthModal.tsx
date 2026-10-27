@@ -7,9 +7,10 @@ interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess?: () => void;
+  closeOnSuccess?: boolean;
 }
 
-export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
+export default function AuthModal({ isOpen, onClose, onSuccess, closeOnSuccess = true }: AuthModalProps) {
   const { signInWithEmail, signUp, signInWithGoogle } = useAuth();
   const { t } = useLanguage();
   const dialogRef = useDialog(isOpen);
@@ -39,7 +40,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
       if (isLogin) {
         const { error: err } = await signInWithEmail(email, password);
         if (err) { setError(err); }
-        else { onClose(); onSuccess?.(); }
+        else { if (closeOnSuccess) onClose(); onSuccess?.(); }
       } else {
         if (!fullName.trim()) { setError('Введите ваше имя'); setLoading(false); return; }
         const { error: err } = await signUp(email, password, fullName);

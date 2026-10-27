@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import UserMenu from './UserMenu';
@@ -11,7 +11,6 @@ export default function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [authOpen, setAuthOpen] = useState(false);
-  const navigate = useNavigate();
   const location = useLocation();
 
 
@@ -22,7 +21,7 @@ export default function Header() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const isActive = (path: string) => location.pathname === path;
+  const isActive = (path: string) => location.pathname === path || (path === '/rooms' && location.pathname.startsWith('/rooms/'));
 
   return (
     <>
@@ -30,15 +29,15 @@ export default function Header() {
         <div className="header-inner">
 
           {/* Logo */}
-          <div className="logo" onClick={() => navigate('/')}>
+          <Link className="logo" to="/" aria-label="ALAY ART — Home">
             <div className="logo-icon">
               <img src="/logo.png" alt="ALAY ART Logo" />
             </div>
             <div className="logo-text">
-              <h1>ALAY ART</h1>
+              <strong className="logo-wordmark">ALAY ART</strong>
               <span>Boutique Hotel • Osh</span>
             </div>
-          </div>
+          </Link>
 
           {/* Nav */}
           <nav className={`nav-links ${menuOpen ? 'open' : ''}`}>
@@ -69,6 +68,7 @@ export default function Header() {
           <div className="header-controls">
             <select
               className="header-select"
+              aria-label="Language"
               value={lang}
               onChange={e => setLang(e.target.value as 'ru' | 'en' | 'kg')}
             >
@@ -79,6 +79,7 @@ export default function Header() {
 
             <select
               className="header-select"
+              aria-label="Currency"
               value={currency}
               onChange={e => setCurrency(e.target.value as 'KGS' | 'USD')}
             >
@@ -98,6 +99,7 @@ export default function Header() {
               className={`hamburger ${menuOpen ? 'open' : ''}`}
               onClick={() => setMenuOpen(!menuOpen)}
               aria-label="Menu"
+              aria-expanded={menuOpen}
             >
               <span></span>
               <span></span>

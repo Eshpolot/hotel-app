@@ -6,6 +6,7 @@ import Header from './components/Header';
 import Home from './pages/Home';
 const Profile = lazy(() => import('./pages/Profile'));
 const Admin = lazy(() => import('./pages/Admin'));
+const RoomDetail = lazy(() => import('./pages/RoomDetail'));
 import RoomsPage from './pages/RoomsPage';
 import ContactsPage from './pages/ContactsPage';
 
@@ -39,6 +40,7 @@ function AppRoutes() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/rooms" element={<RoomsPage />} />
+        <Route path="/rooms/:roomId" element={<RoomDetail />} />
         <Route path="/contacts" element={<ContactsPage />} />
         <Route path="/profile" element={
           <ProtectedRoute><Profile /></ProtectedRoute>

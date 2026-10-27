@@ -15,5 +15,5 @@ test('catalogue fallback remains labelled and gated from online booking',()=>{
  const source=readFileSync('src/components/Rooms.tsx','utf8');
  assert.match(source,/if \(loading \|\| error\) return/);
  assert.match(source,/сохранённый каталог/);
- assert.match(source,/setRooms\(data \|\| \[\]\)/);
+ assert.match(readFileSync('src/hooks/useRooms.ts','utf8'),/setRooms\(result.data \|\| \[\]\)/);
 });
