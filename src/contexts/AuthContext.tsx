@@ -21,42 +21,44 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const fetchProfile = async (userId: string) => {
-    try {
-      const { data } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', userId)
-        .single();
-      if (data) setProfile(data as Profile);
-    } catch {
-      // profile might not exist yet
-    }
-  };
-
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      if (session?.user) fetchProfile(session.user.id);
-      setIsLoading(false);
+    let active = true;
+    let revision = 0;
+    let activeUserId: string | null | undefined;
+    const syncSession = async (next: Session | null) => {
+      const current = ++revision;
+      const nextId = next?.user.id ?? null;
+      setSession(next);
+      setUser(previous => previous?.id === nextId ? previous : next?.user ?? null);
+      if (activeUserId !== nextId) { setProfile(null); setIsLoading(true); }
+      activeUserId = nextId;
+      try {
+        if (next?.user) {
+          const { data, error } = await supabase.from('profiles').select('*').eq('id', next.user.id).single();
+          if (active && current === revision) setProfile(error ? null : data as Profile);
+        }
+      } catch {
+        if (active && current === revision) setProfile(null);
+      } finally {
+        if (active && current === revision) setIsLoading(false);
+      }
+    };
+    // Defer database requests outside the auth callback to avoid auth-lock deadlocks.
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, next) => {
+      setTimeout(() => { if (active) void syncSession(next); }, 0);
     });
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      if (session?.user) fetchProfile(session.user.id);
-      else setProfile(null);
-    });
-
-    return () => subscription.unsubscribe();
+    supabase.auth.getSession().then(({ data, error }) => {
+      if (active && revision === 0) void syncSession(error ? null : data.session);
+    }).catch(() => { if (active) setIsLoading(false); });
+    return () => { active = false; revision++; subscription.unsubscribe(); };
   }, []);
 
   const signInWithGoogle = async () => {
-    await supabase.auth.signInWithOAuth({
+    const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: { redirectTo: window.location.origin }
     });
+    if (error) throw error;
   };
 
   const signInWithEmail = async (email: string, password: string) => {
@@ -74,7 +76,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signOut = async () => {
-    await supabase.auth.signOut();
+    const { error } = await supabase.auth.signOut();
+    if (error) throw error;
     setProfile(null);
   };
 

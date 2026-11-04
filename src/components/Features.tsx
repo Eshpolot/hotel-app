@@ -3,7 +3,7 @@ import { useLanguage } from '../contexts/LanguageContext';
 
 const features = [
   {
-    img: 'https://lh3.googleusercontent.com/d/1dYEs4DzH67x0cEeAclXhF8P8FPbIWXaz',
+    img: '/images/breakfast.webp',
     titleKey: 'breakfast', textKey: 'breakfast_text',
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -13,7 +13,7 @@ const features = [
     )
   },
   {
-    img: 'https://lh3.googleusercontent.com/d/1g55aq5FEets7sv9aotVzJWp43OnfeBEp',
+    img: '/images/family.webp',
     titleKey: 'wifi', textKey: 'wifi_text',
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -23,7 +23,7 @@ const features = [
     )
   },
   {
-    img: 'https://lh3.googleusercontent.com/d/1iYXmMtHFaf6gI87n932UnBZaCym_Nwy2',
+    img: '/images/suite.webp',
     titleKey: 'comfort', textKey: 'comfort_text',
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -33,7 +33,7 @@ const features = [
     )
   },
   {
-    img: 'https://lh3.googleusercontent.com/d/13Xnkpvj4j6wzSM1dUTDt-Hif_FmUM5Mb',
+    img: '/images/cuisine.webp',
     titleKey: 'national_cuisine', textKey: 'national_cuisine_text',
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">

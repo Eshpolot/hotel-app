@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
 type Lang = 'ru' | 'en' | 'kg';
 type Currency = 'KGS' | 'USD';
@@ -48,10 +48,10 @@ const translations: Record<Lang, Record<string, string>> = {
     booking_email: 'Email', booking_phone: 'Телефон', booking_checkin: 'Дата заезда',
     booking_checkout: 'Дата выезда', booking_guests: 'Количество гостей',
     booking_nights: 'Ночей', booking_total: 'Итого',
-    booking_submit: 'Подтвердить бронирование', booking_checking: 'Проверяем доступность...',
+    booking_submit: 'Отправить заявку', booking_checking: 'Отправляем заявку...',
     booking_unavailable: 'К сожалению, номер недоступен на выбранные даты.',
-    booking_success_title: 'Бронирование подтверждено!',
-    booking_success_text: 'Ваш номер забронирован. Мы свяжемся с вами для подтверждения.',
+    booking_success_title: 'Заявка получена!',
+    booking_success_text: 'Мы свяжемся с вами для подтверждения наличия и условий. Статус заявки — в личном кабинете.',
     booking_ref: 'Номер брони',
     profile_title: 'Личный кабинет', my_bookings: 'Мои бронирования',
     no_bookings: 'У вас пока нет бронирований', no_bookings_sub: 'Забронируйте номер и начните своё путешествие',
@@ -109,10 +109,10 @@ const translations: Record<Lang, Record<string, string>> = {
     booking_email: 'Email', booking_phone: 'Phone', booking_checkin: 'Check-in Date',
     booking_checkout: 'Check-out Date', booking_guests: 'Number of Guests',
     booking_nights: 'Nights', booking_total: 'Total',
-    booking_submit: 'Confirm Booking', booking_checking: 'Checking availability...',
+    booking_submit: 'Send request', booking_checking: 'Sending request...',
     booking_unavailable: 'Sorry, the room is not available for the selected dates.',
-    booking_success_title: 'Booking Confirmed!',
-    booking_success_text: 'Your room is booked. We will contact you to confirm.',
+    booking_success_title: 'Request received!',
+    booking_success_text: 'We will contact you to confirm availability and terms. Track your request in your account.',
     booking_ref: 'Booking Reference',
     profile_title: 'My Profile', my_bookings: 'My Bookings',
     no_bookings: 'No bookings yet', no_bookings_sub: 'Book a room and start your journey',
@@ -170,10 +170,10 @@ const translations: Record<Lang, Record<string, string>> = {
     booking_email: 'Email', booking_phone: 'Телефон', booking_checkin: 'Кирүү датасы',
     booking_checkout: 'Чыгуу датасы', booking_guests: 'Коноктор саны',
     booking_nights: 'Түн', booking_total: 'Баары',
-    booking_submit: 'Брондоону ырастоо', booking_checking: 'Жеткиликтүүлүктү текшерүү...',
+    booking_submit: 'Өтүнмө жөнөтүү', booking_checking: 'Жеткиликтүүлүктү текшерүү...',
     booking_unavailable: 'Тилекке каршы, тандалган күндөрдө бөлмө жеткиликтүү эмес.',
-    booking_success_title: 'Бронирование ырасталды!',
-    booking_success_text: 'Бөлмөңүз брондолду. Ырастоо үчүн биз сиз менен байланышабыз.',
+    booking_success_title: 'Өтүнмө кабыл алынды!',
+    booking_success_text: 'Бош бөлмөнү ырастоо үчүн сиз менен байланышабыз. Абалын жеке кабинеттен көрүңүз.',
     booking_ref: 'Бронирование номери',
     profile_title: 'Жеке кабинет', my_bookings: 'Менин брондорум',
     no_bookings: 'Бронированиелер жок', no_bookings_sub: 'Бөлмө брондоп, жолуңузду баштаңыз',
@@ -205,6 +205,7 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [lang, setLang] = useState<Lang>('ru');
   const [currency, setCurrency] = useState<Currency>('KGS');
+  useEffect(() => { document.documentElement.lang = lang === 'kg' ? 'ky' : lang; }, [lang]);
 
   const t = (key: string): string => {
     return translations[lang][key] ?? translations['ru'][key] ?? key;
@@ -212,7 +213,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 
   const formatPrice = (kgs: number): string => {
     if (currency === 'USD') {
-      return `$${Math.round(kgs * KGS_TO_USD)}`;
+      return `≈ $${Math.round(kgs * KGS_TO_USD)}`;
     }
     return `${kgs.toLocaleString('ru')} KGS`;
   };

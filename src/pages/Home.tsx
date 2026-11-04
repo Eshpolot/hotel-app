@@ -1,4 +1,6 @@
-import { useState } from 'react';
+import { useLocation } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import GuestGuide from '../components/GuestGuide';
 import Hero from '../components/Hero';
 import SearchBar from '../components/SearchBar';
 import GalleryStrip from '../components/GalleryStrip';
@@ -18,6 +20,12 @@ interface SearchDates {
 }
 
 export default function Home() {
+  const { hash } = useLocation();
+  useEffect(() => {
+    if (!hash) return;
+    const frame = requestAnimationFrame(() => document.getElementById(hash.slice(1))?.scrollIntoView());
+    return () => cancelAnimationFrame(frame);
+  }, [hash]);
   const [searchDates, setSearchDates] = useState<SearchDates>({ checkIn: '', checkOut: '', guests: '' });
 
   const handleSearch = (checkIn: string, checkOut: string, guests: string) => {
@@ -38,9 +46,10 @@ export default function Home() {
       <SearchBar onSearch={handleSearch} />
       <GalleryStrip />
       <Features />
-      <Rooms searchCheckIn={searchDates.checkIn} searchCheckOut={searchDates.checkOut} />
+      <Rooms searchCheckIn={searchDates.checkIn} searchCheckOut={searchDates.checkOut} searchGuests={searchDates.guests} />
       <WhyUs />
       <Experiences />
+      <GuestGuide />
       <Testimonials />
       <CTA />
       <Contact />

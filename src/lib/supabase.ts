@@ -1,7 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = 'https://lwewgetpbfamgcstylwp.supabase.co';
-const supabaseAnonKey = 'sb_publishable_q6jkRLt6IE1cc05DC7B9jg_bx4ymwIY';
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://lwewgetpbfamgcstylwp.supabase.co';
+// Publishable key is public by design; access control is enforced by RLS.
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || import.meta.env.VITE_SUPABASE_ANON_KEY || 'sb_publishable_q6jkRLt6IE1cc05DC7B9jg_bx4ymwIY';
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 

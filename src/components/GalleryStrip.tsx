@@ -1,13 +1,13 @@
 const images = [
-  { src: 'https://lh3.googleusercontent.com/d/1Eyd68D5i2r5GZQrRgFSYcrubTIPAGS2h', alt: 'ALAY ART Hotel' },
-  { src: 'https://lh3.googleusercontent.com/d/1kvIxu6MY2nkacUNzPOX2ZKdxt7jhimen', alt: 'Interior' },
-  { src: 'https://lh3.googleusercontent.com/d/1dYEs4DzH67x0cEeAclXhF8P8FPbIWXaz', alt: 'Breakfast' },
-  { src: 'https://lh3.googleusercontent.com/d/1rEbP9-tlr4FOmXmkJBz71ADc2m8kAr3w', alt: 'Deluxe Room' },
-  { src: 'https://lh3.googleusercontent.com/d/13Xnkpvj4j6wzSM1dUTDt-Hif_FmUM5Mb', alt: 'National Cuisine' },
-  { src: 'https://lh3.googleusercontent.com/d/1g55aq5FEets7sv9aotVzJWp43OnfeBEp', alt: 'Comfort' },
-  { src: 'https://lh3.googleusercontent.com/d/1iYXmMtHFaf6gI87n932UnBZaCym_Nwy2', alt: 'Design' },
-  { src: 'https://lh3.googleusercontent.com/d/1wjwhqcqPHmMk_aFs3lj91c3zD7_ghJtc', alt: 'Rest Zone' },
-  { src: 'https://lh3.googleusercontent.com/d/1ACiTO230XAOd20Fmh3Zp9iUYc5AtQJpa', alt: 'Hotel' },
+  { src: '/images/tunduk.webp', alt: 'ALAY ART Hotel' },
+  { src: '/images/interior.webp', alt: 'Interior' },
+  { src: '/images/breakfast.webp', alt: 'Breakfast' },
+  { src: '/images/deluxe.webp', alt: 'Deluxe Room' },
+  { src: '/images/cuisine.webp', alt: 'National Cuisine' },
+  { src: '/images/family.webp', alt: 'Comfort' },
+  { src: '/images/suite.webp', alt: 'Design' },
+  { src: '/images/lounge.webp', alt: 'Rest Zone' },
+  { src: '/images/hotel.webp', alt: 'Hotel' },
 ];
 
 export default function GalleryStrip() {

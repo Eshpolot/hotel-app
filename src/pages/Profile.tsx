@@ -1,4 +1,7 @@
-import { useEffect, useState } from 'react';
+import { BuildInfo } from '../components/AppUpdateNotice';
+import { formatBookingReference } from '../lib/bookingReference';
+import { bookingError } from '../lib/bookingErrors';
+import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -8,6 +11,9 @@ export default function Profile() {
   const { user, profile, isLoading, signOut } = useAuth();
   const { t, formatPrice, lang } = useLanguage();
   const navigate = useNavigate();
+  const cancelling = useRef(new Set<string>());
+  const [busyIds, setBusyIds] = useState<string[]>([]);
+  const [actionError, setActionError] = useState('');
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loadingBookings, setLoadingBookings] = useState(true);
 
@@ -29,8 +35,11 @@ export default function Profile() {
         .select('*, room:rooms(*)')
         .eq('user_id', user!.id)
         .order('created_at', { ascending: false });
-      if (!error && data) setBookings(data as Booking[]);
+      if (error) throw error;
+      setBookings((data || []) as Booking[]);
+      setActionError('');
     } catch (err) {
+      setActionError('Не удалось выполнить операцию. Обновите данные и повторите попытку.');
       console.error('Failed to fetch bookings:', err);
     } finally {
       setLoadingBookings(false);
@@ -38,18 +47,23 @@ export default function Profile() {
   };
 
   const cancelBooking = async (bookingId: string) => {
-    if (!confirm(t('cancel_confirm'))) return;
+    if (cancelling.current.has(bookingId) || !confirm(t('cancel_confirm'))) return;
+    cancelling.current.add(bookingId); setBusyIds([...cancelling.current]);
     try {
-      await supabase
+      const { data, error } = await supabase
         .from('bookings')
         .update({ status: 'cancelled' })
         .eq('id', bookingId)
-        .eq('status', 'pending');
+        .eq('status', 'pending').select('id').maybeSingle();
+      if (error || !data) throw error || new Error('STALE_STATUS');
+      setActionError('');
       setBookings(prev =>
         prev.map(b => b.id === bookingId ? { ...b, status: 'cancelled' as const } : b)
       );
     } catch (err) {
-      console.error('Failed to cancel booking:', err);
+      setActionError(bookingError(err, lang));
+    } finally {
+      cancelling.current.delete(bookingId); setBusyIds([...cancelling.current]);
     }
   };
 
@@ -118,7 +132,7 @@ export default function Profile() {
             <button
               className="btn-outline"
               style={{ padding: '10px 20px', fontSize: 13, borderColor: 'rgba(255,255,255,0.4)' }}
-              onClick={async () => { await signOut(); navigate('/'); }}
+              onClick={async () => { try { await signOut(); navigate('/'); } catch { setActionError('Не удалось выйти. Проверьте соединение.'); } }}
             >
               {t('sign_out')}
             </button>
@@ -127,13 +141,15 @@ export default function Profile() {
 
         {/* Bookings */}
         <div className="bookings-section">
+          {actionError && <p role="alert" className="modal-error">{actionError} <button onClick={fetchBookings}>Обновить</button></p>}
           <h3>{t('my_bookings')}</h3>
+          <BuildInfo />
 
           {loadingBookings ? (
             <div style={{ textAlign: 'center', padding: 40 }}>
               <div className="loading-spinner" style={{ margin: '0 auto' }}></div>
             </div>
-          ) : bookings.length === 0 ? (
+          ) : actionError && bookings.length === 0 ? null : bookings.length === 0 ? (
             <div className="no-bookings">
               <div className="no-bookings-icon">🏨</div>
               <p>{t('no_bookings')}</p>
@@ -155,7 +171,7 @@ export default function Profile() {
                     <strong>{formatPrice(booking.total_price_kgs || 0)}</strong>
                   </div>
                   <div style={{ marginTop: 8, fontSize: 12, color: 'var(--text-secondary)' }}>
-                    {t('booking_ref')}: {booking.id.substring(0, 8).toUpperCase()}
+                    {t('booking_ref')}: <code className="booking-reference">{formatBookingReference(booking.id)}</code>
                   </div>
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 8 }}>
@@ -165,6 +181,7 @@ export default function Profile() {
                   {booking.status === 'pending' && (
                     <button
                       className="cancel-btn"
+                      disabled={busyIds.includes(booking.id)}
                       onClick={() => cancelBooking(booking.id)}
                     >
                       {t('cancel_booking')}
