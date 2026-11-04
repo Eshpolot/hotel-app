@@ -44,7 +44,7 @@ export default function Hero({ onBookClick, onExploreClick }: HeroProps) {
           <g className="hero-scroll-seal" stroke="currentColor" strokeWidth="1.25">
             <circle cx="56" cy="32" r="21" />
             <circle cx="56" cy="32" r="17.5" opacity=".45" />
-            <path d="M43 19c16 3 23 10 26 26M39 25c14 2 22 10 24 24M69 19C53 22 46 29 43 45M73 25C59 27 51 35 49 49" />
+            <path d="M43 19c16 3 23 10 26 26M41 22c15 2.5 22.5 10 25 25M39 25c14 2 22 10 24 24M69 19C53 22 46 29 43 45M71 22C56 24.5 48.5 32 46 47M73 25C59 27 51 35 49 49" />
           </g>
           <path d="m56 3 2 3-2 3-2-3Z" fill="currentColor" />
         </svg>
