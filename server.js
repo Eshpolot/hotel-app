@@ -13,10 +13,12 @@ app.use((_req, res, next) => {
 });
 app.use(compression());
 app.use('/assets', express.static(path.join(dist, 'assets'), { maxAge: '1y', immutable: true }));
-app.use(express.static(dist, { maxAge: 0, dotfiles: 'deny' }));
+app.use(express.static(dist, { maxAge: 0, dotfiles: 'deny', setHeaders: (res, file) => {
+  if (file.endsWith('.html') || file.endsWith('version.json')) res.setHeader('Cache-Control', 'no-store');
+} }));
 app.get('/{*path}', (req, res) => {
   if (path.extname(req.path)) return res.sendStatus(404);
-  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Cache-Control', 'no-store');
   res.sendFile(path.join(dist, 'index.html'));
 });
 app.listen(process.env.PORT || 3000, '0.0.0.0');

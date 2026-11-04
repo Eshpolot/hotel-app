@@ -7,9 +7,24 @@ import { defineConfig } from "vite";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+const buildId = `ref-v2-${Date.now().toString(36)}`;
+
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react(), tailwindcss()],
+  define: { 'import.meta.env.VITE_APP_BUILD_ID': JSON.stringify(buildId) },
+  plugins: [react(), tailwindcss(), {
+    name: 'hotel-build-version',
+    generateBundle() {
+      this.emitFile({ type: 'asset', fileName: 'version.json', source: JSON.stringify({ id: buildId }) });
+    },
+    configureServer(server) {
+      server.middlewares.use('/version.json', (_req, res) => {
+        res.setHeader('Content-Type', 'application/json');
+        res.setHeader('Cache-Control', 'no-store');
+        res.end(JSON.stringify({ id: buildId }));
+      });
+    },
+  }],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "src"),

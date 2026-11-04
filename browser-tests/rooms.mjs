@@ -15,6 +15,7 @@ await page.emulateMedia({reducedMotion:'reduce'});
 const errors = [];
 page.on('pageerror', e => errors.push(e.message));
 let mode = 'live';
+let serveNewVersion = false;
 let bookingCalls = [];
 let bookingMode = 'lost';
 let releaseBooking;
@@ -24,6 +25,7 @@ const guest = { id: '11111111-1111-4111-8111-111111111111', aud: 'authenticated'
 const token = Buffer.from(JSON.stringify({alg:'HS256',typ:'JWT'})).toString('base64url') + '.' + Buffer.from(JSON.stringify({sub:guest.id,exp:Math.floor(Date.now()/1000)+3600,aud:'authenticated',role:'authenticated'})).toString('base64url') + '.testsignature';
 await page.route('**/*', async route => {
   const url = route.request().url();
+  if (url.includes('/version.json') && serveNewVersion) return route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({id:'new-test-build'})});
   if (url.includes('/rest/v1/rooms') && new URL(url).searchParams.get('select') === 'price_kgs') return route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({price_kgs:latestPrice})});
   if (url.includes('/rest/v1/rooms')) return mode === 'offline' ? route.abort() : route.fulfill({status:200,contentType:'application/json',body:JSON.stringify(mode === 'empty' ? [] : rooms)});
   if (url.includes('/rest/v1/bookings') && route.request().method() === 'GET') {
@@ -37,7 +39,7 @@ await page.route('**/*', async route => {
     const payload = route.request().postDataJSON(); bookingCalls.push(payload);
     if (bookingMode === 'price') return route.fulfill({status:400,contentType:'application/json',body:JSON.stringify({code:'P0001',message:'PRICE_CHANGED'})});
     if (!savedRequests.has(payload.p_request_key)) savedRequests.set(payload.p_request_key, {
-      id:'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', status:'pending', total_price_kgs:payload.p_expected_price*3
+      id:'42f4e4b3-c6c6-4a10-92cc-6a265fa3fc1b', status:'pending', total_price_kgs:payload.p_expected_price*3
     });
     if (bookingMode === 'lost') { await new Promise(resolve => { releaseBooking = resolve; }); return route.abort(); }
     return route.fulfill({status:200,contentType:'application/json',body:JSON.stringify(savedRequests.get(payload.p_request_key))});
@@ -145,8 +147,10 @@ try {
   await page.getByRole('heading',{name:'Заявка получена!',exact:true}).waitFor();
   assert.equal(bookingCalls.at(-1).p_expected_price,7000);
   console.log('PASS changed price requires explicit refresh and review before new submission');
+  const confirmationBuild = await page.getByRole('dialog').locator('.build-info').innerText();
+  assert.match(confirmationBuild,/ref-v2-/);
   const confirmedReference = await page.locator('.booking-ref .booking-reference').innerText();
-  assert.equal(confirmedReference,'AAAAAAAA-AAAA-4AAA-8AAA-AAAAAAAAAAAA');
+  assert.equal(confirmedReference,'42F4E4B3-C6C6-4A10-92CC-6A265FA3FC1B');
   await page.getByRole('dialog').getByRole('link').click();
   await page.locator('.booking-card .booking-reference').waitFor();
   assert.equal(await page.locator('.booking-card .booking-reference').innerText(),confirmedReference);
@@ -154,7 +158,13 @@ try {
   await page.locator('.booking-card .booking-reference').waitFor();
   assert.equal(await page.locator('.booking-card .booking-reference').innerText(),confirmedReference);
   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth <= innerWidth),true);
-  console.log('PASS complete booking code matches confirmation and profile, including after reload');
+  assert.equal(await page.locator('.build-info').innerText(),confirmationBuild);
+  console.log('PASS reported booking code matches confirmation/profile after reload; same visible build ID');
+  serveNewVersion = true;
+  await page.evaluate(()=>document.dispatchEvent(new Event('visibilitychange')));
+  await page.getByRole('button',{name:'Обновить сайт',exact:true}).waitFor();
+  assert.equal(await page.locator('.booking-card .booking-reference').innerText(),confirmedReference);
+  console.log('PASS stale-build notification preserves current page instead of automatic reload');
   assert.deepEqual(errors,[]);
   console.log('PASS email sign-in continues booking with selected stay; no JS exceptions');
 } finally { await browser.close(); }

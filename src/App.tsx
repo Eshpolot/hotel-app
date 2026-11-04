@@ -1,3 +1,4 @@
+import AppUpdateNotice from './components/AppUpdateNotice';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ReactNode, lazy, Suspense } from 'react';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
@@ -36,6 +37,7 @@ function AppRoutes() {
   return (
     <>
       <Header />
+      <AppUpdateNotice />
       <Suspense fallback={<div className="loading-screen" role="status">Загрузка…</div>}>
       <Routes>
         <Route path="/" element={<Home />} />

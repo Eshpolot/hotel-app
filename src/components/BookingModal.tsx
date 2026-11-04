@@ -1,3 +1,4 @@
+import { BuildInfo } from './AppUpdateNotice';
 import { formatBookingReference } from '../lib/bookingReference';
 import { bookingError } from '../lib/bookingErrors';
 import { bookingRequestKey, forgetBookingRequest } from '../lib/bookingRequest';
@@ -162,6 +163,7 @@ export default function BookingModal({ isOpen, onClose, room, initialCheckIn = '
               <code className="booking-reference">{formatBookingReference(savedBooking?.id ?? '')}</code>
             </div>
             <Link className="btn-gold" style={{ marginTop: 20 }} to="/profile" onClick={close}>{t('my_bookings')}</Link>
+            <BuildInfo />
           </div>
         </div>
       </div>
@@ -215,7 +217,8 @@ export default function BookingModal({ isOpen, onClose, room, initialCheckIn = '
 
           {available === 0 && <p role="status" className="modal-error">{bookingError({message: 'ROOM_UNAVAILABLE'}, lang)}</p>}
           <p className="catalog-note">{lang === 'en' ? 'A request does not reserve a room. Availability is checked again on confirmation.' : lang === 'kg' ? 'Өтүнмө бөлмөнү ээлебейт. Ырастоодо бош бөлмө кайра текшерилет.' : 'Заявка не закрепляет номер. При подтверждении отель повторно проверяет наличие.'}</p>
-          {error && <div role="alert" className="modal-error">{error} <Link to="/profile" onClick={close}>{t('my_bookings')}</Link></div>}
+          {error && <div role="alert" className="modal-error">{error} <Link to="/profile" onClick={close}>{t('my_bookings')}</Link>
+            <BuildInfo /></div>}
           {priceChanged && <button type="button" className="detail-secondary" onClick={refreshPrice}>{lang === 'en' ? 'Refresh price' : lang === 'kg' ? 'Бааны жаңылоо' : 'Обновить цену'}</button>}
           <button type="submit" className="modal-submit" disabled={loading || priceChanged}>
             {loading ? t('booking_checking') : t('booking_submit')}

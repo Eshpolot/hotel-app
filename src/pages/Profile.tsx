@@ -1,3 +1,4 @@
+import { BuildInfo } from '../components/AppUpdateNotice';
 import { formatBookingReference } from '../lib/bookingReference';
 import { bookingError } from '../lib/bookingErrors';
 import { useEffect, useState, useRef } from 'react';
@@ -142,6 +143,7 @@ export default function Profile() {
         <div className="bookings-section">
           {actionError && <p role="alert" className="modal-error">{actionError} <button onClick={fetchBookings}>Обновить</button></p>}
           <h3>{t('my_bookings')}</h3>
+          <BuildInfo />
 
           {loadingBookings ? (
             <div style={{ textAlign: 'center', padding: 40 }}>
