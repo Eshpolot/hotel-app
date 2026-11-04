@@ -1,3 +1,4 @@
+import { formatBookingReference } from '../lib/bookingReference';
 import { bookingError } from '../lib/bookingErrors';
 import { bookingRequestKey, forgetBookingRequest } from '../lib/bookingRequest';
 import { useDialog } from '../hooks/useDialog';
@@ -32,7 +33,6 @@ export default function BookingModal({ isOpen, onClose, room, initialCheckIn = '
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
-  const [bookingRef, setBookingRef] = useState('');
 
   const [notes, setNotes] = useState('');
   const [guestName, setGuestName] = useState('');
@@ -136,7 +136,6 @@ export default function BookingModal({ isOpen, onClose, room, initialCheckIn = '
       const booking = result.data as Booking;
       if (!booking?.id) throw new Error('INVALID_RESPONSE');
       setSavedBooking(booking);
-      setBookingRef(booking.id.toUpperCase());
       forgetBookingRequest(request.storageKey);
       setSuccess(true);
     } catch (err) {
@@ -160,7 +159,7 @@ export default function BookingModal({ isOpen, onClose, room, initialCheckIn = '
             <p>{t('booking_total')}: {formatPrice(savedBooking?.total_price_kgs || 0)}</p>
             <div className="booking-ref">
               <div style={{ fontSize: 13, color: 'var(--text-secondary)', marginBottom: 4 }}>{t('booking_ref')}</div>
-              <strong>{bookingRef}</strong>
+              <code className="booking-reference">{formatBookingReference(savedBooking?.id ?? '')}</code>
             </div>
             <Link className="btn-gold" style={{ marginTop: 20 }} to="/profile" onClick={close}>{t('my_bookings')}</Link>
           </div>

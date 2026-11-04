@@ -1,3 +1,4 @@
+import { formatBookingReference } from '../lib/bookingReference';
 import { bookingError } from '../lib/bookingErrors';
 import { allowedBookingStatuses } from '../lib/bookingStatus';
 import { today } from '../lib/booking';
@@ -37,8 +38,9 @@ export default function Admin() {
     let list = [...bookings];
     if (statusFilter !== 'all') list = list.filter(b => b.status === statusFilter);
     if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase();
+      const q = searchQuery.trim().toLowerCase();
       list = list.filter(b =>
+        b.id.toLowerCase().includes(q) ||
         b.guest_name.toLowerCase().includes(q) ||
         b.guest_email.toLowerCase().includes(q)
       );
@@ -226,7 +228,7 @@ export default function Admin() {
                       {booking.guest_phone && <div>{booking.guest_phone}</div>}
                       {booking.notes && <details><summary>Пожелания гостя</summary><p style={{maxWidth: 280, whiteSpace: 'pre-wrap'}}>{booking.notes}</p></details>}
                     </td>
-                    <td>{getRoomName(booking)}</td>
+                    <td>{getRoomName(booking)}<div className="admin-booking-reference">{t('booking_ref')}: <code className="booking-reference">{formatBookingReference(booking.id)}</code></div></td>
                     <td style={{ fontSize: 13 }}>
                       {formatDate(booking.check_in)} →<br />{formatDate(booking.check_out)}
                     </td>

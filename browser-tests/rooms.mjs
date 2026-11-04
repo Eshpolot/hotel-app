@@ -26,6 +26,10 @@ await page.route('**/*', async route => {
   const url = route.request().url();
   if (url.includes('/rest/v1/rooms') && new URL(url).searchParams.get('select') === 'price_kgs') return route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({price_kgs:latestPrice})});
   if (url.includes('/rest/v1/rooms')) return mode === 'offline' ? route.abort() : route.fulfill({status:200,contentType:'application/json',body:JSON.stringify(mode === 'empty' ? [] : rooms)});
+  if (url.includes('/rest/v1/bookings') && route.request().method() === 'GET') {
+    const saved = [...savedRequests.values()].at(-1);
+    return route.fulfill({status:200,contentType:'application/json',body:JSON.stringify(saved ? [{...saved, user_id:guest.id, room_id:2, room:rooms[1], guest_name:'Test Guest', guest_email:guest.email, check_in:arrival, check_out:departure, nights:3, guests_count:2, created_at:new Date().toISOString()}] : [])});
+  }
   if (url.includes('/auth/v1/token')) return route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({access_token:token,refresh_token:'test-refresh',expires_in:3600,token_type:'bearer',user:guest})});
   if (url.includes('/rest/v1/profiles')) return route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({id:guest.id,full_name:'Test Guest',role:'guest'})});
   if (url.includes('/rpc/check_hotel_availability')) return route.fulfill({status:200,contentType:'application/json',body:'1'});
@@ -141,6 +145,16 @@ try {
   await page.getByRole('heading',{name:'Заявка получена!',exact:true}).waitFor();
   assert.equal(bookingCalls.at(-1).p_expected_price,7000);
   console.log('PASS changed price requires explicit refresh and review before new submission');
+  const confirmedReference = await page.locator('.booking-ref .booking-reference').innerText();
+  assert.equal(confirmedReference,'AAAAAAAA-AAAA-4AAA-8AAA-AAAAAAAAAAAA');
+  await page.getByRole('dialog').getByRole('link').click();
+  await page.locator('.booking-card .booking-reference').waitFor();
+  assert.equal(await page.locator('.booking-card .booking-reference').innerText(),confirmedReference);
+  await page.reload();
+  await page.locator('.booking-card .booking-reference').waitFor();
+  assert.equal(await page.locator('.booking-card .booking-reference').innerText(),confirmedReference);
+  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth <= innerWidth),true);
+  console.log('PASS complete booking code matches confirmation and profile, including after reload');
   assert.deepEqual(errors,[]);
   console.log('PASS email sign-in continues booking with selected stay; no JS exceptions');
 } finally { await browser.close(); }

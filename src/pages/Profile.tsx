@@ -1,3 +1,4 @@
+import { formatBookingReference } from '../lib/bookingReference';
 import { bookingError } from '../lib/bookingErrors';
 import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -168,7 +169,7 @@ export default function Profile() {
                     <strong>{formatPrice(booking.total_price_kgs || 0)}</strong>
                   </div>
                   <div style={{ marginTop: 8, fontSize: 12, color: 'var(--text-secondary)' }}>
-                    {t('booking_ref')}: {booking.id.substring(0, 8).toUpperCase()}
+                    {t('booking_ref')}: <code className="booking-reference">{formatBookingReference(booking.id)}</code>
                   </div>
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 8 }}>

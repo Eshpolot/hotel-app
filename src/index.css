@@ -1354,3 +1354,9 @@ button:disabled { opacity: .55; cursor: not-allowed; }
 @media(max-width:360px) { .header .logo-text { display:none; } }
 
 .booking-ref strong { overflow-wrap:anywhere; font-size:18px; letter-spacing:1px; }
+
+/* One complete reference across confirmation, account and administration. */
+.booking-reference { font-family:ui-monospace, SFMono-Regular, Consolas, monospace; font-size:inherit; overflow-wrap:anywhere; user-select:all; }
+.booking-ref .booking-reference { display:block; font-size:16px; font-weight:600; letter-spacing:.5px; }
+.booking-card > div { min-width:0; }
+.admin-booking-reference { margin-top:6px; max-width:250px; font-size:11px; color:var(--text-secondary); }
