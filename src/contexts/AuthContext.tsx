@@ -24,9 +24,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     let active = true;
     let revision = 0;
+    let activeUserId: string | null | undefined;
     const syncSession = async (next: Session | null) => {
       const current = ++revision;
-      setSession(next); setUser(next?.user ?? null); setProfile(null); setIsLoading(true);
+      const nextId = next?.user.id ?? null;
+      setSession(next);
+      setUser(previous => previous?.id === nextId ? previous : next?.user ?? null);
+      if (activeUserId !== nextId) { setProfile(null); setIsLoading(true); }
+      activeUserId = nextId;
       try {
         if (next?.user) {
           const { data, error } = await supabase.from('profiles').select('*').eq('id', next.user.id).single();
@@ -71,7 +76,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signOut = async () => {
-    await supabase.auth.signOut();
+    const { error } = await supabase.auth.signOut();
+    if (error) throw error;
     setProfile(null);
   };
 

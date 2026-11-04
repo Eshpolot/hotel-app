@@ -7,6 +7,8 @@ export default function UserMenu() {
   const { user, profile, signOut } = useAuth();
   const { t } = useLanguage();
   const navigate = useNavigate();
+  const [signOutError, setSignOutError] = useState('');
+  const [signingOut, setSigningOut] = useState(false);
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -27,9 +29,11 @@ export default function UserMenu() {
   const initials = displayName.slice(0, 2).toUpperCase();
 
   const handleSignOut = async () => {
-    setOpen(false);
-    await signOut();
-    navigate('/');
+    if (signingOut) return;
+    setSigningOut(true); setSignOutError('');
+    try { await signOut(); setOpen(false); navigate('/'); }
+    catch { setSignOutError('Не удалось выйти. Проверьте соединение и повторите.'); }
+    finally { setSigningOut(false); }
   };
 
   return (
@@ -70,8 +74,9 @@ export default function UserMenu() {
           )}
 
           <div className="user-dropdown-divider"></div>
+          {signOutError && <p role="alert" className="modal-error">{signOutError}</p>}
 
-          <button className="user-dropdown-item danger" onClick={handleSignOut}>
+          <button className="user-dropdown-item danger" disabled={signingOut} onClick={handleSignOut}>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" />
               <polyline points="16 17 21 12 16 7" />

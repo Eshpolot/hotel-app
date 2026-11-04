@@ -15,13 +15,29 @@ await page.emulateMedia({reducedMotion:'reduce'});
 const errors = [];
 page.on('pageerror', e => errors.push(e.message));
 let mode = 'live';
+let bookingCalls = [];
+let bookingMode = 'lost';
+let releaseBooking;
+let latestPrice = 6500;
+const savedRequests = new Map();
 const guest = { id: '11111111-1111-4111-8111-111111111111', aud: 'authenticated', role: 'authenticated', email: 'test@example.com', user_metadata: {full_name: 'Test Guest'}, app_metadata: {}, created_at: new Date().toISOString() };
 const token = Buffer.from(JSON.stringify({alg:'HS256',typ:'JWT'})).toString('base64url') + '.' + Buffer.from(JSON.stringify({sub:guest.id,exp:Math.floor(Date.now()/1000)+3600,aud:'authenticated',role:'authenticated'})).toString('base64url') + '.testsignature';
-await page.route('**/*', route => {
+await page.route('**/*', async route => {
   const url = route.request().url();
+  if (url.includes('/rest/v1/rooms') && new URL(url).searchParams.get('select') === 'price_kgs') return route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({price_kgs:latestPrice})});
   if (url.includes('/rest/v1/rooms')) return mode === 'offline' ? route.abort() : route.fulfill({status:200,contentType:'application/json',body:JSON.stringify(mode === 'empty' ? [] : rooms)});
   if (url.includes('/auth/v1/token')) return route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({access_token:token,refresh_token:'test-refresh',expires_in:3600,token_type:'bearer',user:guest})});
   if (url.includes('/rest/v1/profiles')) return route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({id:guest.id,full_name:'Test Guest',role:'guest'})});
+  if (url.includes('/rpc/check_hotel_availability')) return route.fulfill({status:200,contentType:'application/json',body:'1'});
+  if (url.includes('/rpc/request_hotel_booking')) {
+    const payload = route.request().postDataJSON(); bookingCalls.push(payload);
+    if (bookingMode === 'price') return route.fulfill({status:400,contentType:'application/json',body:JSON.stringify({code:'P0001',message:'PRICE_CHANGED'})});
+    if (!savedRequests.has(payload.p_request_key)) savedRequests.set(payload.p_request_key, {
+      id:'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', status:'pending', total_price_kgs:payload.p_expected_price*3
+    });
+    if (bookingMode === 'lost') { await new Promise(resolve => { releaseBooking = resolve; }); return route.abort(); }
+    return route.fulfill({status:200,contentType:'application/json',body:JSON.stringify(savedRequests.get(payload.p_request_key))});
+  }
   if (!url.startsWith(base)) return route.abort();
   return route.continue();
 });
@@ -92,6 +108,39 @@ try {
   await page.getByRole('dialog').getByLabel('Имя гостя', {exact:true}).waitFor();
   assert.equal(await page.getByRole('dialog').getByLabel('Дата заезда',{exact:true}).inputValue(),arrival);
   assert.equal(await page.getByRole('dialog').getByLabel('Количество гостей',{exact:true}).inputValue(),'2');
+  const form = page.getByRole('dialog').locator('form');
+  await form.evaluate(form => { form.requestSubmit(); form.requestSubmit(); });
+  await page.waitForFunction(()=>document.querySelector('.modal-submit')?.disabled === true);
+  // Wait for the mocked server to have accepted the first request.
+  while (!releaseBooking) await new Promise(resolve => setTimeout(resolve,10));
+  assert.equal(bookingCalls.length,1);
+  assert.equal(await page.getByRole('dialog').getByLabel('Имя гостя',{exact:true}).isDisabled(),true);
+  await page.keyboard.press('Escape');
+  assert.equal(await page.getByRole('dialog').count(),1);
+  releaseBooking();
+  await page.getByRole('dialog').getByRole('alert').waitFor();
+  bookingMode='success';
+  await page.getByRole('button',{name:'Отправить заявку',exact:true}).click();
+  await page.getByRole('heading',{name:'Заявка получена!',exact:true}).waitFor();
+  assert.equal(bookingCalls.length,2);
+  assert.equal(bookingCalls[0].p_request_key,bookingCalls[1].p_request_key);
+  assert.equal(savedRequests.size,1);
+  console.log('PASS double-submit lock, disabled edits/close, lost-response retry uses identical key');
+
+  await page.getByRole('dialog').getByRole('button',{name:'Закрыть / Close'}).click();
+  await page.getByRole('button',{name:'Оставить заявку',exact:true}).click();
+  bookingMode='price'; latestPrice=7000;
+  await page.getByRole('button',{name:'Отправить заявку',exact:true}).click();
+  await page.getByRole('button',{name:'Обновить цену',exact:true}).waitFor();
+  assert.equal(await page.getByRole('button',{name:'Отправить заявку',exact:true}).isDisabled(),true);
+  await page.getByRole('button',{name:'Обновить цену',exact:true}).click();
+  await page.waitForFunction(()=>!document.querySelector('.modal-submit').disabled);
+  assert.match(await page.locator('.booking-total-price').innerText(),/21\s?000/);
+  bookingMode='success';
+  await page.getByRole('button',{name:'Отправить заявку',exact:true}).click();
+  await page.getByRole('heading',{name:'Заявка получена!',exact:true}).waitFor();
+  assert.equal(bookingCalls.at(-1).p_expected_price,7000);
+  console.log('PASS changed price requires explicit refresh and review before new submission');
   assert.deepEqual(errors,[]);
   console.log('PASS email sign-in continues booking with selected stay; no JS exceptions');
 } finally { await browser.close(); }

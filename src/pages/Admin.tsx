@@ -1,4 +1,7 @@
-import { useEffect, useState } from 'react';
+import { bookingError } from '../lib/bookingErrors';
+import { allowedBookingStatuses } from '../lib/bookingStatus';
+import { today } from '../lib/booking';
+import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -10,6 +13,8 @@ export default function Admin() {
   const { user, profile, isLoading } = useAuth();
   const { t, formatPrice, lang } = useLanguage();
   const navigate = useNavigate();
+  const updating = useRef(new Set<string>());
+  const [busyIds, setBusyIds] = useState<string[]>([]);
   const [actionError, setActionError] = useState('');
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [filtered, setFiltered] = useState<Booking[]>([]);
@@ -60,14 +65,18 @@ export default function Admin() {
   };
 
   const updateStatus = async (bookingId: string, newStatus: Booking['status']) => {
+    const previous = bookings.find(b => b.id === bookingId);
+    if (!previous || updating.current.has(bookingId) || previous.status === newStatus) return;
+    updating.current.add(bookingId); setBusyIds([...updating.current]);
     try {
-      const { data, error } = await supabase.from('bookings').update({ status: newStatus }).eq('id', bookingId).select('id').single();
-      if (error || !data) throw error || new Error('Not updated');
+      const { data, error } = await supabase.from('bookings').update({ status: newStatus }).eq('id', bookingId).eq('status', previous.status).select('id').maybeSingle();
+      if (error || !data) throw error || new Error('STALE_STATUS');
       setActionError('');
       setBookings(prev => prev.map(b => b.id === bookingId ? { ...b, status: newStatus } : b));
     } catch (err) {
-      setActionError('Не удалось выполнить операцию. Обновите данные и повторите попытку.');
-      console.error(err);
+      setActionError(bookingError(err, lang));
+    } finally {
+      updating.current.delete(bookingId); setBusyIds([...updating.current]);
     }
   };
 
@@ -228,13 +237,15 @@ export default function Admin() {
                     <td>
                       <select
                         className={`status-select ${booking.status}`}
+                        disabled={busyIds.includes(booking.id) || ['completed', 'cancelled'].includes(booking.status)}
+                        aria-label={`${t('col_status')}: ${booking.guest_name}`}
                         value={booking.status}
                         onChange={e => updateStatus(booking.id, e.target.value as Booking['status'])}
                       >
-                        <option value="pending">{t('status_pending')}</option>
-                        <option value="confirmed">{t('status_confirmed')}</option>
-                        <option value="completed">{t('status_completed')}</option>
-                        <option value="cancelled">{t('status_cancelled')}</option>
+                        <option value="pending" disabled={!allowedBookingStatuses(booking.status, booking.check_out, today()).includes('pending')}>{t('status_pending')}</option>
+                        <option value="confirmed" disabled={!allowedBookingStatuses(booking.status, booking.check_out, today()).includes('confirmed')}>{t('status_confirmed')}</option>
+                        <option value="completed" disabled={!allowedBookingStatuses(booking.status, booking.check_out, today()).includes('completed')}>{t('status_completed')}</option>
+                        <option value="cancelled" disabled={!allowedBookingStatuses(booking.status, booking.check_out, today()).includes('cancelled')}>{t('status_cancelled')}</option>
                       </select>
                     </td>
                   </tr>
