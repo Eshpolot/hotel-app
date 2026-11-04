@@ -392,9 +392,38 @@ input, select, textarea { font-family:inherit; }
   animation:fadeInUp 0.8s var(--ease) 0.4s both;
 }
 .hero-buttons { display:flex; gap:16px; justify-content:center; flex-wrap:wrap; animation:fadeInUp 0.8s var(--ease) 0.6s both; }
-.hero-scroll { position:absolute; bottom:30px; left:50%; transform:translateX(-50%); z-index:2; animation:fadeInUp 1s var(--ease) 1s both; }
-.hero-scroll-inner { width:28px; height:44px; border:2px solid rgba(255,255,255,0.4); border-radius:14px; position:relative; }
-.hero-scroll-dot { width:4px; height:8px; background:white; border-radius:4px; position:absolute; top:8px; left:50%; transform:translateX(-50%); animation:float1 2s ease-in-out infinite; }
+.hero-scroll {
+  position:absolute; bottom:22px; left:50%; transform:translateX(-50%); z-index:2;
+  display:flex; flex-direction:column; align-items:center; width:112px; padding:4px 0;
+  border:0; border-radius:8px; background:none; color:#e2c78f; cursor:pointer;
+  filter:drop-shadow(0 2px 8px rgba(0,0,0,.35));
+  transition:color .4s ease, background .4s ease;
+}
+.hero-scroll-emblem { display:block; width:96px; height:55px; }
+.hero-scroll-seal { animation:sealBreath 5s ease-in-out infinite; }
+.hero-scroll-flourish { opacity:.65; transition:opacity .4s ease; }
+.hero-scroll:hover { color:#ffe7b6; background:rgba(15,15,30,.16); }
+.hero-scroll:hover .hero-scroll-flourish { opacity:1; }
+.hero-scroll:focus-visible { outline:2px solid var(--gold-light); outline-offset:5px; }
+.hero-scroll-trail { position:relative; display:block; width:14px; height:24px; }
+.hero-scroll-trail::before {
+  content:''; position:absolute; top:0; left:6.5px; width:1px; height:14px;
+  background:linear-gradient(to bottom, transparent, currentColor); opacity:.65;
+}
+.hero-scroll-trail svg {
+  position:absolute; bottom:0; width:14px; height:8px; stroke:currentColor;
+  stroke-width:1.2; stroke-linecap:round; stroke-linejoin:round;
+  animation:sealInvitation 3.6s ease-in-out infinite;
+}
+@keyframes sealBreath { 0%,100% { opacity:.65; } 50% { opacity:1; } }
+@keyframes sealInvitation {
+  0%,100% { opacity:.35; transform:translateY(-2px); }
+  50% { opacity:.9; transform:translateY(2px); }
+}
+/* Keep the ornament clear of the hero actions on short landscape screens. */
+@media (max-height:640px) {
+  .hero { min-height:640px; }
+}
 
 /* ========== SEARCH BAR ========== */
 .search-section { background:var(--accent); padding:0; position:relative; z-index:10; }
